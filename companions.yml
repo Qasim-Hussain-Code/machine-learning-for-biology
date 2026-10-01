@@ -1,0 +1,38 @@
+# Each chapter's code, data pipeline and results live in their own repository.
+# The book pins each one to a commit, so a reader always runs the code the chapter describes.
+chapters:
+  - chapter: 1
+    title: Predicting antibiotic resistance from a genome
+    model: logistic regression
+    repository: Qasim-Hussain-Code/campylobacter_amr_phenotype_prediction
+    commit: 0e2b3df4c587
+  - chapter: 2
+    title: What does a cell show to the immune system?
+    model: decision tree
+    repository: Qasim-Hussain-Code/peptide_mhc_binding_prediction
+    commit: d701b62eb203
+  - chapter: 3
+    title: Is a gene a fact or a call?
+    model: random forest
+    repository: Qasim-Hussain-Code/bakta_prokka_disagreement_prediction
+    commit: 4f797c3fa09d
+  - chapter: 4
+    title: What happens to the patients who are still alive?
+    model: gradient boosting
+    repository: Qasim-Hussain-Code/cancer_survival_ml_pipeline
+    commit: 85d831ca383c
+  - chapter: 5
+    title: Gut bacteria and cardiovascular risk
+    model: support vector machine
+    repository: Qasim-Hussain-Code/tmao_cardiovascular_risk_prediction
+    commit: 9985756c2db6
+  - chapter: 6
+    title: Neoantigen immunogenicity for cancer vaccine design
+    model: neural network
+    repository: Qasim-Hussain-Code/neoantigen_immunogenicity_prediction
+    commit: 68a12d14824d
+  - chapter: 7
+    title: Immune cell subtype discovery from single-cell RNA-seq
+    model: k-means
+    repository: Qasim-Hussain-Code/immune_cell_subtype_discovery
+    commit: 1141fa411573
