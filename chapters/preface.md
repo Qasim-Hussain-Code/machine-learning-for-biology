@@ -4,8 +4,9 @@ title: Preface
 ---
 
 This book began as a series of daily posts. Between 24 July and 1 October 2026, I posted seventy of them on machine
-learning for biology, one a day, each written to stand on its own. Here, the first and the last are rewritten as the
-prologue and the epilogue, and the rest as seven chapters, with one model and one biological question to each.
+learning for biology, one a day, each written to stand on its own. The first, which introduced the series, is not
+included. The last is rewritten as the epilogue, and the rest as seven chapters, with one model and one biological
+question to each.
 
 Chapter 1 uses logistic regression to ask whether antibiotic resistance can be read straight from a bacterial genome.
 Chapter 2 uses a decision tree to ask which fragments of a protein, called peptides, a cell will show to the immune
@@ -27,10 +28,9 @@ given only the stage a clinician already knows, and one given nothing but how ti
 that displays it. Results that failed are reported beside results that held, and some chapters are mostly about the
 failures.
 
-The prologue explains where this started, and the epilogue sets the seven models side by side at the end. I wrote the
-book for two kinds of reader: biologists who want to see what a model is doing, and people who build models and want to
-see where biological data can mislead them. Terms from either side are explained where they first appear, many of them
-in short notes beside the text.
+The epilogue sets the seven models side by side at the end. I wrote the book for two kinds of reader: biologists who
+want to see what a model is doing, and people who build models and want to see where biological data can mislead them.
+Terms from either side are explained where they first appear, many of them in short notes beside the text.
 
 Every chapter has a public repository with its code, its data pipeline and the numbers it reports. The end of each
 chapter links to that repository, pinned to the commit the chapter describes, and the code listings in the text are

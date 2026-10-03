@@ -1,82 +1,11 @@
-# Corrections for the front and back matter: preface, prologue and epilogue
+# Corrections for the front and back matter: preface and epilogue
 
 Each entry gives the sentence before and after the change, the source that settles it, and the value found there. The
-front and back matter have no repository of their own. For the prologue the sources are the published works it
-describes, each checked against the document itself and, where it has a DOI, against its Crossref record
-(`https://api.crossref.org/works/<doi>`). For the preface and the epilogue they are the chapter repositories at the
+front and back matter have no repository of their own; their sources are the chapter repositories at the
 commits the chapters pin.
 
-## 1. The hours Baggerly and Coombes spent, thousands to more than 1,500 (prologue)
-
-Before: Proving it took two statisticians thousands of hours, because the code and the processed data behind it were
-never released.
-
-After: Proving it took two statisticians more than 1,500 hours (Coombes, 2012), because the code and the processed data
-behind it were never released.
-
-Before (front matter summary): Two biostatisticians at MD Anderson, Keith Baggerly and Kevin Coombes, spent thousands of
-hours reconstructing the analysis from its published figures ...
-
-After: ... spent more than 1,500 hours reconstructing the analysis from its published figures ...
-
-Source: Kevin R. Coombes, "The need for publicly verifiable and reproducible data and analyses", slides for a talk at
-Research Integrity, Mohonk, 8 August 2012,
-`https://www.uab.edu/norc/images/conferences/documents/KCoombes-Mohonk-Aug-2012.pdf` (29 pages, footed "© Copyright
-2011-2012, Kevin R. Coombes and Keith A. Baggerly").
-
-Value found: the slide headed "Did the System Work?", numbered 11 (page 12 of the PDF): "Why was it so hard for the
-investigators to see the problems clearly? We spent 1500+ hours figuring out what happened." The "we" is the two
-statisticians: the same slide speaks of "the seriousness of the scientific errors that we complained about". The deck
-also shows the two errors the prologue names, under the headings "Gene Lists Were Off-by-One" (slide 2) and
-"Sensitive/Resistant Labels Were Reversed" (slide 5), and its timeline (slide 8) has Duke suspending the trials in
-September and October 2009 and again in July 2010. The post gives no source for "thousands of hours". The end of the
-body sentence was changed later, in entry 9.
-
-## 2. The paper is not named (prologue)
-
-The sentence "The method was published in *Nature Medicine* in 2006." keeps the post's wording. A version of this
-pass named the paper and its 2011 retraction, with the Crossref records for `10.1038/nm1491` and `10.1038/nm0111-135`
-as evidence; on 2 October 2026 the author asked for the paper not to be cited, so the name, the retraction and the two
-reference entries were removed again. Only the journal and the year, as the post gives them, remain.
-
-## 3. Citations in the text, and a References section (prologue)
-
-Added: "(Coombes, 2012)" after "more than 1,500 hours"; "(Baggerly and Coombes, 2009)" after "a practice they called
-forensic bioinformatics"; and, after the provenance line, a References section with two entries: Baggerly and Coombes
-(2009) and Coombes (2012).
-
-Value found, entry by entry:
-
-- Baggerly and Coombes (2009). The Crossref record for `10.1214/09-AOAS291` gives the title "Deriving chemosensitivity
-  from cell lines: Forensic bioinformatics and reproducible research in high-throughput biology", *The Annals of Applied
-  Statistics*, volume 3, issue 4, 1 December 2009, by Keith A. Baggerly and Kevin R. Coombes, and no page range. The
-  pages are printed in the header of the article itself, "The Annals of Applied Statistics 2009, Vol. 3, No. 4,
-  1309-1334, DOI: 10.1214/09-AOAS291", in the copy deposited on arXiv as `1010.1092`, and the arXiv record's journal
-  reference gives the same pages. The abstract names the practice ("exercises in 'forensic bioinformatics'"), section
-  2.2 is headed "Training data sensitive/resistant labels are reversed", and section 3.2 traces gene lists that were
-  "off-by-one" to "a single row shift". The footer of the Day 1 post in the Chapter 1 repository traces "label
-  reversals, off-by-one" to this paper.
-- Coombes (2012). Title, event, date and address from the first slide and the file of entry 1, whose PDF metadata names
-  Kevin R. Coombes as the author.
-
-## 4. Where the book stops (prologue)
-
-Before (the last sentence of the prologue): The code, the notebooks, the mistakes and the dead ends would all be
-open-sourced and public.
-
-After: The code, the notebooks, the mistakes and the dead ends would all be open-sourced and public. This book covers
-the first part of that plan, the basics of machine learning in seven models from logistic regression to k-means, and it
-stops there on purpose.
-
-Sources: `sources/interlude-61.md` (Day 61: "Machine Learning for Biology ends here on purpose, at a real stopping
-point, not because the models ran out") and `sources/epilogue.md` (Day 70: "Seven chapters, seven models, and the basics
-of machine learning, one idea at a time"). The copies of both posts kept in the Chapter 7 repository
-(`Qasim-Hussain-Code/immune_cell_subtype_discovery`, `posts/day_61.md` and `posts/day_70.md` at `1141fa411573`) say the
-same.
-
-Value found: the plan in the prologue runs from foundations and classical methods on omics data to deep learning,
-sequence models and generative and agentic systems. The seven chapters run from logistic regression in Chapter 1 to
-k-means in Chapter 7.
+Entries 1 to 4, 9, 10 and 13 concerned the prologue, which was withdrawn from the book on 3 October 2026. They are not
+reproduced here, and the remaining entries keep their numbers so that references to them still hold.
 
 ## 5. What Chapter 5 ran (preface)
 
@@ -159,51 +88,6 @@ no later post corrects it. "Seven chapters, seven models" still opens the epilog
 support vector machine does, so the book introduces seven models, one to a chapter, though the one Chapter 5 introduces
 was never fitted.
 
-## 9. Why the reconstruction took so long, never released to never released in full (prologue)
-
-Before: Proving it took two statisticians more than 1,500 hours (Coombes, 2012), because the code and the processed data
-behind it were never released.
-
-After: Proving it took two statisticians more than 1,500 hours (Coombes, 2012), because the code and the processed data
-behind it were never released in full.
-
-Sources: Baggerly and Coombes (2009), in the arXiv copy of entry 3, and the slides of entry 1. The Institute of
-Medicine's report Evolution of Translational Omics: Lessons Learned and the Path Forward (2012,
-`https://doi.org/10.17226/13297`), Appendix B, agrees with both.
-
-Value found: Table 1 of Baggerly and Coombes (2009), "Locations of data used in our analyses", lists under "Potti et al.
-(2006) web site, accessed April 4, 2009" the file "Binreg.zip", "Metagene prediction software", and under "Potti et al.
-(2006) web site, November 6, 2007, no longer posted" the file "Adria_ALL.txt", "Numbers, Sens/Res labels for 144
-samples, 22 training cell lines, 122 testing samples". Section 2.1: "We first acquired the raw doxorubicin (adriamycin)
-data (Adria_ALL.txt) posted by Potti and Nevins (2007)", and section 2.2 finds that "The posted numbers have been
-transformed relative to the MAS5 quantifications used earlier". Section 3: "We acquired the binreg Matlab scripts used
-for model fitting and heatmap generation from the Potti et al. (2006) web site." So some of the code and some of the
-processed data were released, and "never released" is contradicted. What was missing was the rest: section 7.2 names
-"incomplete documentation and lack of reproducibility", and section 7.3.2 says "We see it as unavoidable that complete
-scripts will also eventually be required." The slides, slide 26, "The Institutional Challenge" (page 28 of the PDF):
-"Insisting that code and data be made publicly available would not have prevented the problems at Duke. We might have
-found the problems earlier; others might have been able to confirm them more easily." Appendix B of the report:
-"Computer code used to generate the gene expression-based computational models in Potti et al. (2006a) was available on
-a Duke website (Baggerly and Coombes, 2009)", and "Even with access to the publicly available primary data and code
-posted by the authors on a Duke website, Baggerly and Coombes were unable to reproduce the published results." The
-post's "were never released", which entry 1 kept, is the wording changed here.
-
-## 10. What the analysis was reconstructed from (prologue)
-
-Before: So they reverse-engineered the analysis from the published figures, a practice they called forensic
-bioinformatics (Baggerly and Coombes, 2009). (Summary: ... reconstructing the analysis from its published figures ...)
-
-After: So they reverse-engineered the analysis from the published results and the files the authors had posted, a
-practice they called forensic bioinformatics (Baggerly and Coombes, 2009). (Summary: ... reconstructing the analysis
-from its published results and posted files ...)
-
-Source: Baggerly and Coombes (2009), as in entry 9.
-
-Value found: the abstract describes forensic bioinformatics as working from "aspects of raw data and reported
-results", Table 1 lists the files taken from the authors' website ("Binreg.zip", "Adria_ALL.txt"), and section 3 says
-the Matlab scripts were acquired from that site. The post's "from the published figures" named only part of what they
-worked from.
-
 ## 11. Before running anything, to before fitting anything (epilogue)
 
 Before: Fix the rules before running anything.
@@ -232,20 +116,6 @@ Value found: commit `26aef85b1464` ("add_prereg_posts"), at 09:57 UTC on 3 Septe
 day, Day 42 fell on 3 September, Day 43 on 4 September, Day 44 on 5 September and Day 45 on 6 September, so the posts
 for Days 43 to 45 were written before the days they appeared. What the sources give is one post for each day, not one
 written each day.
-
-## 13. What was not in the algorithm (prologue)
-
-Before: What went wrong is the reason this book exists. It was not the algorithm.
-
-After: What went wrong is the reason this book exists. None of the errors found later was in the algorithm.
-
-Source: Baggerly and Coombes (2009), https://doi.org/10.1214/09-AOAS291, section 7.3.1.
-
-Value found: the errors the reconstruction found, sensitive and resistant labels reversed and gene lists shifted by one
-row, were in the data and its handling, not in the classifier. Section 7.3.1 adds that the approach did no better
-without them: "We have tried making predictions from the NCI60 cell lines when we step through the process without the
-errors noted above, and we get results no better than chance." So "It was not the algorithm" could be read as saying the
-method would otherwise have worked, which the record does not support. The sentence now says only what the record shows.
 
 ## 14. Why Chapter 5's design never ran (preface and epilogue)
 

@@ -15,7 +15,7 @@ EPI_ROLE = ('Nobel Laureate · Co-Founder and Chair, Google DeepMind · Chief Sc
 EPI_SRC = '“A Framework for Frontier AI and the Dawning of a New Age”, 14 July 2026'
 
 # reading order: (file stem, page name, part)
-ORDER = [('preface', 'preface', None), ('prologue', 'prologue', None)] + \
+ORDER = [('preface', 'preface', None)] + \
         [(f'ch{n:02d}', f'chapter-{n}', 'I' if n < 7 else 'II') for n in range(1, 8)] + [('epilogue', 'epilogue', None)]
 PARTS = {'I': 'Part I · Learning from labels', 'II': 'Part II · Learning without labels'}
 
@@ -292,7 +292,7 @@ def title_page():
     main = f'''<section class="titlepage"><h1 class="tp-title">{BOOK}</h1>
 <figure class="epigraph"><blockquote>{EPIGRAPH}</blockquote><figcaption><span class="who">{EPI_WHO}</span>
 <span class="role">{EPI_ROLE}</span><span class="src">{EPI_SRC}</span></figcaption></figure>
-<p class="tp-author">{AUTHOR}</p></section><hr class="tpbreak">
+<p class="tp-author">{AUTHOR}</p><p class="tp-beta"><b>Beta edition.</b> This book will be revised, corrected and extended continuously for some time yet. Suggestions for its improvement are most welcome, through an <a href="https://github.com/Qasim-Hussain-Code/machine-learning-for-biology/issues">issue on its repository</a> or a message on <a href="https://www.linkedin.com/in/qasim--hussain">LinkedIn</a>.</p></section><hr class="tpbreak">
 <section class="contents"><h2 class="ch">Contents</h2><ol>{"".join(contents)}</ol></section>'''
     return shell(BOOK, 'index', main, None, (first, 'Begin reading'))
 

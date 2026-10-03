@@ -8,11 +8,14 @@ them and pins each to the commit the chapter describes.
 Read it at https://qasim-hussain-code.github.io/machine-learning-for-biology/, where the PDF and EPUB editions can also
 be downloaded.
 
+This is a beta edition. The book will be revised, corrected and extended continuously for some time yet, and
+suggestions for its improvement are most welcome, as an issue on this repository or a message on LinkedIn.
+
 ## Layout
 
 | Path | What it holds |
 | --- | --- |
-| `chapters/` | The text: preface, prologue, chapters 1 to 7 and epilogue, in Markdown with front matter |
+| `chapters/` | The text: preface, chapters 1 to 7 and epilogue, in Markdown with front matter |
 | `sources/` | The posts each piece was rewritten from, the only admissible source of facts and numbers |
 | `sources/corrections/` | Every fact in the posts that the chapter's repository or the cited literature showed to be wrong, with the source that settles each one |
 | `figures/svg/` | The book's drawn figures, which follow the reader's light or dark theme |

@@ -34,6 +34,8 @@ a{color:var(--accent)}
 .tp-title{font-size:var(--tsz);margin:0;letter-spacing:-.005em}
 .tp-sub{font-family:var(--fh);font-style:italic;font-weight:400;font-size:calc(var(--tsz)*.46);color:var(--muted);margin:8px 0 20px}
 .tp-author{font:15px/1 var(--fx);letter-spacing:.04em;color:var(--ink);margin:0 0 36px}
+.tp-beta{margin:-12px 0 36px;padding:10px 14px;border-left:3px solid var(--accent);font-size:15px;line-height:1.6;color:var(--ink);max-width:62ch}
+.tp-beta b{font-weight:600}
 .epigraph{margin:0;max-width:540px;border-left:1px solid var(--accent);padding:2px 0 2px 20px}
 .epigraph blockquote{margin:0;font-family:var(--fb);font-style:italic;font-size:1.08em;line-height:1.5;color:var(--ink)}
 .epigraph figcaption{margin-top:10px;font-size:13px;line-height:1.5;color:var(--muted)}
