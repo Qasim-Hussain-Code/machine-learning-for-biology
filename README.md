@@ -6,9 +6,7 @@ fixes its rules before running anything. The code for each chapter stays in its 
 them and pins each to the commit the chapter describes.
 
 Read it at https://qasim-hussain-code.github.io/machine-learning-for-biology/, where the PDF and EPUB editions can also
-be downloaded.
-
-This is a beta edition. The book will be revised, corrected and extended continuously for some time yet, and
+be downloaded. This is a beta edition. The book will be revised, corrected and extended continuously for some time yet, and
 suggestions for its improvement are most welcome, as an issue on this repository or a message on LinkedIn.
 
 ## Layout
