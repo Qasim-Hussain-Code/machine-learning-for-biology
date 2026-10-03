@@ -17,7 +17,6 @@ suggestions for its improvement are most welcome, as an issue on this repository
 | --- | --- |
 | `chapters/` | The text: preface, chapters 1 to 7 and epilogue, in Markdown with front matter |
 | `sources/` | The posts each piece was rewritten from, the only admissible source of facts and numbers |
-| `sources/corrections/` | Every fact in the posts that the chapter's repository or the cited literature showed to be wrong, with the source that settles each one |
 | `figures/svg/` | The book's drawn figures, which follow the reader's light or dark theme |
 | `STYLE.md` | The editorial guide every piece follows |
 | `tools/lint_chapter.py` | Checks a piece against `STYLE.md` and its sources |
@@ -38,7 +37,3 @@ downloaded; Chrome prints the book's own print stylesheet twice, so that the con
     python tools/print_book.py
     python tools/epub_book.py
     python tools/build_book.py      # again, so the title page links to the PDF and the EPUB
-
-Check a piece before building:
-
-    python tools/lint_chapter.py chapters/ch03.md sources/ch3.md sources/corrections/ch3.md
