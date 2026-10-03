@@ -22,8 +22,7 @@ chapters:
     repository: Qasim-Hussain-Code/cancer_survival_ml_pipeline
     commit: 85d831ca383c
   - chapter: 5
-    title: Gut bacteria and cardiovascular risk
-    model: support vector machine
+    title: Gut bacteria and cardiovascular risk    model: logistic regression (support vector machine planned)
     repository: Qasim-Hussain-Code/tmao_cardiovascular_risk_prediction
     commit: 9985756c2db6
   - chapter: 6

@@ -1,0 +1,163 @@
+<!doctype html><html lang="en-GB" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What happens to the patients who are still alive? · Machine Learning for Biology</title>
+<meta name="description" content="Machine Learning for Biology, a book by Qasim Hussain.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/book.css">
+<script>(function(){var r=document.documentElement;try{var s=localStorage.getItem('mlb-theme');if(s)r.dataset.theme=s;}catch(e){}})();</script>
+</head><body class="lay-sidebar hs-smallcaps justify">
+<a class="skip" href="#main">Skip to the text</a>
+<header class="topbar"><a class="tb-title" href="index.html">Machine Learning for Biology</a>
+<div class="tb-right"><a class="tb-ed" href="machine-learning-for-biology.pdf" aria-label="Download the print edition, PDF (2 MB)" title="Download the print edition, PDF (2 MB)">PDF</a><a class="tb-ed" href="machine-learning-for-biology.epub" download aria-label="Download the e-book edition, EPUB (0 MB)" title="Download the e-book edition, EPUB (0 MB)">EPUB</a><button class="modebtn" type="button" aria-label="Switch to light mode">Light<span class="wide"> mode</span></button></div></header>
+<div class="frame"><nav class="toc" aria-label="Contents"><details class="tocd" open><summary class="toch">Contents</summary><ol><li><a href="preface.html">Preface</a></li><li><a href="prologue.html">Prologue</a></li><li class="part">Part I · Learning from labels</li><li><a href="chapter-1.html"><span class="n">1</span> Predicting antibiotic resistance from a genome<span class="m">Logistic regression</span></a></li><li><a href="chapter-2.html"><span class="n">2</span> What does a cell show to the immune system?<span class="m">Decision tree</span></a></li><li><a href="chapter-3.html"><span class="n">3</span> Is a gene a fact or a call?<span class="m">Random forest</span></a></li><li class="on"><a href="chapter-4.html" aria-current="page"><span class="n">4</span> What happens to the patients who are still alive?<span class="m">Gradient boosting</span></a><ol class="secs"><li><a href="#why-gradient-boosting-and-why-it-needs-a-different-objective"><span class="sn">4.1</span>Why gradient boosting, and why it needs a different objective</a></li><li><a href="#the-rules"><span class="sn">4.2</span>The rules</a></li><li><a href="#four-ways-this-could-be-wrong"><span class="sn">4.3</span>Four ways this could be wrong</a></li><li><a href="#what-happened"><span class="sn">4.4</span>What happened</a></li><li><a href="#what-the-result-does-and-does-not-show"><span class="sn">4.5</span>What the result does and does not show</a></li></ol></li><li><a href="chapter-5.html"><span class="n">5</span> Gut bacteria and cardiovascular risk<span class="m">Logistic regression (support vector machine planned)</span></a></li><li><a href="chapter-6.html"><span class="n">6</span> Neoantigen immunogenicity for cancer vaccine design<span class="m">Neural network</span></a></li><li class="part">Part II · Learning without labels</li><li><a href="chapter-7.html"><span class="n">7</span> Immune cell subtype discovery from single-cell RNA-seq<span class="m">k-means</span></a></li><li><a href="epilogue.html">Epilogue</a></li></ol><p class="tohome"><a href="index.html">Title page and contents</a></p></details></nav><main class="col" id="main"><header class="opener op-smallcaps"><p class="op-kicker">Chapter 4 · Part I · Learning from labels</p>
+<h1 class="op-title">What happens to the patients who are still alive?</h1><p class="op-model">Model: Gradient boosting</p>
+<p class="op-question">How do you model when something happens to a patient, if for many patients it has not happened yet?</p></header><section class="summary"><p class="sk">Summary</p><p>Gradient boosting with a Cox partial likelihood objective, trained to rank colorectal cancer patients by their risk of recurrence or death in a cohort of 586, treating the 401 with no dated event as not yet rather than never. On 176 patients held out from training, 56 of them with an event, it reached a concordance index of 0.7289 against 0.6743 for stage alone. With both models refitted on colon cases alone, the gap narrowed to 0.7228 against 0.706 and could not be told apart from chance; adding tumour mutation count, tested on the 159 held-out patients who had it, changed the concordance index by less than a hundredth. The model ranks patients somewhat better than stage does, and it was built to rank them, not to tell any one patient how long they have.</p></section><div class="bodywrap"><p>A patient enrols in a cancer study. Years pass. The study closes on a fixed date, the same date for everyone, and it does not matter where each patient&rsquo;s disease happens to be on that day. Some patients have had their event by then: a recurrence, confirmed and dated. Others have not, and are alive and disease-free when the clock stops. For them the true answer is not yet.</p>
+<p>Every chapter so far has asked a yes-or-no question: resistant or not, bound or not, named the same or not. This chapter asks a harder kind of question. It asks when something happens. The data is cancer survival, with real patients, real follow-up time and real recurrence, and it brings a new way for the label itself to lie.</p>
+<aside class="note">
+<p><strong>Censoring.</strong> A patient is censored when the study stops watching before the event being watched for has happened. All that is known is that the event had not occurred by the last date anyone checked.</p>
+</aside>
+<p>Suppose the patients still alive are treated as a no, the same as someone followed for ten years who never recurred. Then the model has been told something false. A patient followed for eight months with no event yet and a patient followed for eight years with no event ever look identical in that label. Those are not the same fact. One is early. One is settled.</p>
+<p>Censoring is not unique to cancer data. Any study with a fixed end date and an event that might happen later has it: component failure, customer churn, reoffending after release. Biology just makes the stakes obvious.</p>
+<p>There is a common wrong move here, and I named it before I could be tempted by it. Drop everyone still alive at the end, and keep only the patients with a known event. That feels safe. In fact it deletes exactly the patients who are doing best, because good outcomes take longer to prove than bad ones. The remaining data is quietly enriched for recurrence, and the model learns a population that does not exist.</p>
+<p>So the label for this chapter is two numbers together: how long a patient was followed, and whether the thing being watched for happened before the watching stopped. The patients still alive at the end are not missing data, and they are not a problem to clean up before modelling starts. They are the central fact of the chapter. Model around them carelessly and every number that follows is wrong.</p>
+<h2 id="why-gradient-boosting-and-why-it-needs-a-different-objective"><span class="secno">4.1</span> Why gradient boosting, and why it needs a different objective</h2>
+<p>There is a reason Chapter 3 ended on random forests. Averaging many trees is one way to reduce error. Building trees one at a time, each one correcting what the last one got wrong, is another. That second way is gradient boosting, the next model on the list set out in Chapter 2. It had already made a quiet appearance in Chapter 3, as a comparison.</p>
+<p>Every model before this one was trained to predict one number and checked against one answer. This one predicts a number and is checked against two things at once: whether the event happened, and how long it took. Ordinary gradient boosting cannot do that. The measure a model is trained to improve is called its objective function, and it sets what counts as a good prediction. Without an objective function that understands censoring, gradient boosting does exactly what I warned against above, and scores a patient still doing well at eight months the same as one confirmed disease-free at eight years.</p>
+<p>The fix is called the Cox partial likelihood, and the idea behind it is older than gradient boosting itself. Do not ask the model to predict a survival time directly. Ask it for a risk score, and judge that score by how well it puts patients in the order in which their events came.</p>
+<p>In practice it works like this (Figure 4.1). At the moment each event occurs, look at everyone still at risk, meaning everyone who has not yet had the event and is still being followed. The patient it happened to should have scored higher risk than everyone else still in the running at that moment. Do that at every event in the data and add it up, and the result is a single number the model can be trained to improve. A censored patient takes part in every one of these comparisons up to the last date anyone checked on them, and in none after it. The model is never asked to know exactly when. It is asked to know who is more at risk than whom, at every moment someone&rsquo;s risk became real.</p>
+<figure class="fig" id="fig-4-1"><svg role="img" aria-label="Five horizontal lines, one per patient, start together at diagnosis on a time axis. A dashed vertical line marks the moment of one event. The top two lines, labelled event earlier and censored earlier, end before it, are grey and are marked not in this comparison. A shaded band labelled still at risk at this moment holds the other three: the line labelled event at this moment, which ends on the dashed line in a large dot marked should score highest, and two lines that run on past the moment, labelled censored later and event later." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 412" class="figsvg">
+  <rect x="0" y="146" width="640" height="202" rx="10" class="fp"/>
+  <g font-size="22">
+    <text x="12" y="77" class="fm">Event earlier</text>
+    <text x="12" y="127" class="fm">Censored earlier</text>
+    <text x="12" y="183" class="fi">Event at this moment</text>
+    <text x="12" y="233" class="fi">Censored later</text>
+    <text x="12" y="283" class="fi">Event later</text>
+    <text x="12" y="330" class="fa">Still at risk at this moment</text>
+  </g>
+  <line x1="380" y1="40" x2="380" y2="372" class="si" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <text x="380" y="26" font-size="22" text-anchor="middle" class="fi">The moment of one event</text>
+  <g stroke-width="4" stroke-linecap="round">
+    <line x1="246" y1="70" x2="290" y2="70" class="sm"/>
+    <line x1="246" y1="120" x2="336" y2="120" class="sm"/>
+    <line x1="246" y1="176" x2="380" y2="176" class="sa2"/>
+    <line x1="246" y1="226" x2="506" y2="226" class="sa"/>
+    <line x1="246" y1="276" x2="592" y2="276" class="sa"/>
+  </g>
+  <circle cx="290" cy="70" r="7" class="fm"/>
+  <circle cx="336" cy="120" r="7" class="fbg sm" stroke-width="3"/>
+  <circle cx="380" cy="176" r="10" class="fa2"/>
+  <circle cx="506" cy="226" r="7" class="fp sa" stroke-width="3"/>
+  <circle cx="592" cy="276" r="7" class="fa"/>
+  <text x="398" y="103" font-size="22" class="fm">Not in this comparison</text>
+  <text x="398" y="183" font-size="22" class="fa2">Should score highest</text>
+  <g class="si" stroke-width="1.5">
+    <line x1="246" y1="372" x2="616" y2="372"/>
+    <line x1="246" y1="364" x2="246" y2="380"/>
+  </g>
+  <polygon points="628,372 614,366 614,378" class="fi"/>
+  <g font-size="22" class="fm">
+    <text x="246" y="404" text-anchor="middle">Diagnosis</text>
+    <text x="628" y="404" text-anchor="end">Time since diagnosis</text>
+  </g>
+</svg>
+<figcaption><b>Figure 4.1</b> The comparison the Cox partial likelihood makes at one event, sketched for five patients followed from diagnosis to an event (filled dot) or to a last check with no event (open circle). The patient with the event should have a higher risk score than everyone else still at risk at that moment (shaded); patients whose event or last check came earlier take no part in it, and the same comparison is made at every event.</figcaption></figure>
+
+<p>The two numbers of the label reach the model as one. Listing 4.1 shows how: the follow-up time is kept positive for a patient who had an event and made negative for one who was censored.</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 4.1</b> The label handed to the boosted model, from <code>scripts/survival_utils.py</code>.</span></summary><pre tabindex="0"><code class="language-python">def cox_labels(time, event):
+    &quot;&quot;&quot;XGBoost survival:cox labels: positive time for events, negative for censored.&quot;&quot;&quot;
+    time = np.asarray(time, dtype=float)
+    event = np.asarray(event).astype(bool)
+    return np.where(event, time, -time)
+</code></pre></details>
+<p>One consequence was worth sitting with before any result existed. A model can have excellent concordance, putting patients in the right order of risk, and still be useless for telling one specific patient how long they have. Ranking who is at higher risk is a different skill from predicting a date. This chapter is about the first skill, and I named that limit before a number could make it inconvenient to say.</p>
+<h2 id="the-rules"><span class="secno">4.2</span> The rules</h2>
+<p>I wrote the rules down before I had loaded a single row.</p>
+<div class="rules"><p class="rh">Rules for this chapter</p>
+<p><strong>Event.</strong> The first confirmed recurrence, or death from any cause, whichever comes first. Time is measured from diagnosis.</p>
+<p><strong>Censoring.</strong> Anyone with no confirmed event by their last recorded contact is censored at that date. Patients still in active follow-up and patients lost to follow-up are treated the same: alive and event-free, as of the last date anyone checked.</p>
+<p><strong>Exclusion.</strong> Patients with less than thirty days of follow-up are excluded before the split, not after.</p>
+<p><strong>Split.</strong> Grouped, as in Chapter 3. One patient, one group, never divided between train and test.</p>
+<p><strong>Metric.</strong> Concordance index, not accuracy and not F1.</p>
+<p><strong>Baseline.</strong> Stage alone, on the same patients.</p>
+</div>
+<p>The label is disease-free survival, not overall survival and not progression-free survival on treatment. Death from any cause is in there deliberately. A patient who dies in a car accident before their cancer could recur is a hard case, and different studies handle it differently. I counted it as an event, not a censor. Pretending that patient&rsquo;s follow-up simply continued would be its own quiet lie. I recorded the choice in advance so that I could not change it later if the number looked better the other way.</p>
+<p>Starting the clock at diagnosis was a choice too. Enrolment and the end of primary treatment would each give a different clock, and three different clocks make three different chapters.</p>
+<p>Listing 4.2 is the event rule as the pipeline applies it to each patient. The earlier of a dated recurrence and a dated death becomes the event. A patient with neither is censored at the latest recorded contact.</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 4.2</b> Setting each patient’s time and event, from <code>scripts/02_build_cohort.py</code>.</span></summary><pre tabindex="0"><code class="language-python">candidates = [d for d in (first_recurrence, first_death) if d is not None]
+if candidates:
+    time, event = min(candidates), 1
+    if first_recurrence is not None and first_recurrence == time:
+        event_type = &quot;recurrence&quot;
+    else:
+        event_type = &quot;death&quot;
+else:
+    contacts = [c for c in ([number(row.get(&quot;last_contact_days_to&quot;))]
+                            + fu_contact[barcode] + fu_death[barcode])
+                if c is not None]
+    if not contacts:
+        audit[&quot;dropped_no_time&quot;] += 1
+        continue
+    time, event, event_type = max(contacts), 0, &quot;censored&quot;
+</code></pre></details>
+<aside class="note">
+<p><strong>Concordance index (C-index).</strong> Of two randomly chosen patients whose order is known, does the model rank them in the correct order by risk? The order is known only when the patient followed for less time had the event, so pairs in which that patient was censored are left out. Chance is 0.5. A perfect ranking is 1.0.</p>
+</aside>
+<p>The thirty-day threshold exists because so short a follow-up says nothing, and including those patients would let the model learn from noise dressed up as signal. The grouped split did not need deciding, only restating.</p>
+<p>The concordance index asks a narrower question than accuracy does. The model learns to get orderings right, and it is scored the same way.</p>
+<p>The baseline is stage alone: whatever a clinician already knows from TNM staging, and nothing else. TNM records how far the primary tumour has grown (T), whether the cancer has reached nearby lymph nodes (N) and whether it has spread to distant parts of the body (M), and the three are combined into a single stage. If gradient boosting could not beat stage, the honest chapter would be the one that said so.</p>
+<h2 id="four-ways-this-could-be-wrong"><span class="secno">4.3</span> Four ways this could be wrong</h2>
+<p>I did not know whether this chapter would work, so I wrote down why it might not before I found out (Figure 4.2).</p>
+<figure class="fig" id="fig-4-2"><svg role="img" aria-label="A numbered list of four warnings, each with its check beneath it. One: the cohort is not a random sample of cancer patients; check, none possible from within the cohort. Two: one clinical fact may count as several features; check, rank correlation among stage, pT, pN and others. Three: events, not patients, limit a survival model; check, below 50 events, a result carries a warning. Four: closer follow-up, not the tumour, may predict outcome; check, early follow-up contacts against later events." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 392" class="figsvg">
+  <g class="sl" stroke-width="1.2">
+    <line x1="0" y1="98" x2="640" y2="98"/>
+    <line x1="0" y1="196" x2="640" y2="196"/>
+    <line x1="0" y1="294" x2="640" y2="294"/>
+  </g>
+  <g font-size="34" class="fa num">
+    <text x="4" y="58">1</text>
+    <text x="4" y="156">2</text>
+    <text x="4" y="254">3</text>
+    <text x="4" y="352">4</text>
+  </g>
+  <g font-size="23" class="fi">
+    <text x="50" y="40">The cohort is not a random sample of cancer patients</text>
+    <text x="50" y="138">One clinical fact may count as several features</text>
+    <text x="50" y="236">Events, not patients, limit a survival model</text>
+    <text x="50" y="334">Closer follow-up, not the tumour, may predict outcome</text>
+  </g>
+  <g font-size="22" class="fm">
+    <text x="50" y="74"><tspan class="fa">Check:</tspan> none possible from within the cohort</text>
+    <text x="50" y="172"><tspan class="fa">Check:</tspan> rank correlation among stage, pT, pN and others</text>
+    <text x="50" y="270"><tspan class="fa">Check:</tspan> below <tspan class="num" font-size="24">50</tspan> events, a result carries a warning</text>
+    <text x="50" y="368"><tspan class="fa">Check:</tspan> early follow-up contacts against later events</text>
+  </g>
+</svg>
+<figcaption><b>Figure 4.2</b> The four ways the chapter could be wrong, named before the pipeline ran, and how each could be checked.</figcaption></figure>
+
+<p>The first is the cohort. Public cancer cohorts are not a random sample of cancer patients. They are the patients whose data made it into a study, at institutions with the funding to run one, filtered by inclusion criteria that already excluded the sickest and most complicated cases. Whatever this model learns, it learned from that population and not from cancer patients generally.</p>
+<p>The second is structural rather than a matter of sampling. Stage, grade and tumour size are correlated with each other. Bigger tumours tend to be later stage, and later stage tends to mean higher grade. A model can look as if it found three independent signals when it found one signal, badly, three times. Chapter 3 met a form of this, which I call circularity: a model detecting the tool that made the label rather than the biology underneath it. The version here is one clinical fact, detected through three correlated proxies and reported as three important features instead of one.</p>
+<p>This data turned out to record neither grade nor tumour size, so the check for this warning ran on stage and the other descriptors that were recorded, with pT, the T category of TNM, standing in for tumour size, and pN, the N category, for the lymph nodes. Stage is built partly from those two, so the check still asked the same question.</p>
+<p>The third is a small event count. Survival models are limited by how many events occurred, not by how many patients were enrolled. A cohort of a thousand patients with sixty events behaves, for fitting purposes, much closer to a cohort of sixty. If confirmed recurrences in this cohort number in the low hundreds, the honest ceiling is lower than the sample size suggests.</p>
+<p>The fourth is the one I was most likely to get away with unless I checked for it directly. How closely a patient is followed can itself carry information that has nothing to do with biology. Some patients are followed more closely because a clinician was already worried. That worry, not the tumour, can end up predicting outcome.</p>
+<p>None of these breaks the chapter. Each one changes what a result would mean. Each one would be checked and reported, whether or not it changed the headline number.</p>
+<h2 id="what-happened"><span class="secno">4.4</span> What happened</h2>
+<p>The cohort is 586 patients from two public colorectal cancer datasets. Of these, 185 had an event: the cancer came back, or the patient died. The other 401 had no event with a date, as of the last time anyone checked on them. One of them did have a recurrence on record, but without a date it could not start a clock, so that patient was censored with the others.</p>
+<p>The model was given ten pieces of information about each patient, things like cancer stage, lymph node status and treatment history.</p>
+<p>I tested it on 176 patients the model had never seen, 56 of whom had an event. The model scored 0.7289 on the concordance index. It got the ordering of a pair of patients right about seventy-three times out of a hundred. To score stage alone on the same patients, I fitted a Cox proportional hazards model, a regression model built for survival data, to stage and nothing else on the 410 training patients, giving patients whose stage was not recorded a level of their own. Stage alone scored 0.6743.</p>
+<p>Besides the four warnings, I had committed to two checks before I knew what they would show.</p>
+<p>The first asked what happens when only colon cancer is considered, leaving out rectal cancer. I refitted both models on the 297 colon patients in the training set, 96 of whom had an event, and scored them on the 128 colon patients held out, 42 of whom had one. The model scored 0.7228 against 0.706 for stage. That is still an improvement, but a smaller one, and this time the gap is not clearly bigger than what chance alone could produce. Both groups agree that the model does better. Only the larger, mixed group is confident enough to say that the improvement is real rather than noise.</p>
+<p>The second asked whether knowing how many mutations a tumour carries adds anything. Of the 586 patients, 540 had this data. Their mutation counts split into two groups, as expected in this cancer: 77 of the 540 tumours, 14.3%, carry more than 10 mutations per megabase, which is the hypermutated fraction already known in colorectal cancer. So I trust the measurement. I refitted the model with and without mutation count on the patients who had it, and scored both on the 159 of them held out, 52 with an event. Without mutation count the model scored 0.7243, and with it 0.7302. The difference, 0.0059, is less than a hundredth, and its 95% interval runs from negative 0.0055 to 0.0186. That takes in zero, so the change could easily be nothing at all. There is no evidence here that mutation count helped this model predict risk.</p>
+<p>Then the four warnings. The first, that this cohort is not a random sample of cancer patients, cannot be tested from within the cohort. Every number in this chapter describes these patients, not colorectal cancer patients in general.</p>
+<p>The second warning asked whether the model would find one real signal and report it as two or three separate important features, making it look as if it used more information than it did. That one did happen. The two most important features were stage and pN, the lymph node category, and the two move together. Across the 566 patients with both recorded, their rank correlation is 0.8289, where 1 would mean that they always rise together. They are largely one fact about the patient, counted twice.</p>
+<p>The third was the event count. Before fitting, I had fixed a floor of 50 events, below which a result would carry a warning. The main split, colon and rectal cases together, cleared it, with 129 events among the training patients and 56 among those held out. The colon-only test set did not. It had 42, and at that number of events the colon gap cannot be told apart from chance.</p>
+<p>The fourth asked whether being checked on more often, because a doctor was more concerned, itself went with a worse outcome, so that the model could have learned the doctor&rsquo;s worry rather than anything about the cancer. I found no evidence that it did. The test I had fixed before looking at the data counted each patient&rsquo;s follow-up contacts in the first 90 days after diagnosis, and asked whether that count predicted an event after those 90 days. It could not run. Follow-up forms in these datasets are filed once a year, so only 4 of the 544 patients still at risk at 90 days had any contact inside the window. After seeing that, and before testing anything against outcome, I widened the window to the first 365 days. Each extra contact in that year went with a hazard ratio of 0.455 for an event afterwards. A hazard ratio of 1 would mean no effect at all, and the 95% interval around 0.455, from 0.1678 to 1.2341, takes in 1.</p>
+<h2 id="what-the-result-does-and-does-not-show"><span class="secno">4.5</span> What the result does and does not show</h2>
+<p>The model ranks patients by their risk of recurrence or death somewhat better than stage alone does. That is the finding.</p>
+<p>The improvement over stage holds up only in the larger, mixed group. On colon cases alone it points the same way but cannot be told apart from noise. The second warning came true, so the model&rsquo;s list of important features overstates how many separate signals it used. And the result says nothing about how long any particular patient has.</p>
+<p>Four chapters have now used four models. Logistic regression drew a straight line through a decision. A single decision tree could be read out loud, one split at a time. A random forest let many trees vote together, each one blind to what the others saw. Gradient boosting built trees one after another, each correcting what the last got wrong, and here it was adapted to patients whose outcome had not happened yet. That is the standard path through tree-based models, the one most textbooks follow in roughly the same order, and it ends here. Chapter 5 sets out to use a support vector machine, the next step on that same standard progression.</p>
+<p class="prov">This chapter is rewritten from the posts for Days 40 to 46 of the series.</p></div><section class="endm"><div class="run"><p class="eh">Run it</p>
+<p><span class="lbl">Repository</span> <a href="https://github.com/Qasim-Hussain-Code/cancer_survival_ml_pipeline">cancer_survival_ml_pipeline</a></p>
+<p><span class="lbl">Commit</span> <a href="https://github.com/Qasim-Hussain-Code/cancer_survival_ml_pipeline/tree/85d831ca383c"><code>85d831ca383c</code></a></p></div>
+<div class="cite"><p class="eh">Cite this chapter</p><p>Hussain, Q. (2026). What happens to the patients who are still alive? In <i>Machine Learning for Biology</i>, chapter 4.</p></div></section><nav class="pn" aria-label="Previous and next"><a class="prev" href="chapter-3.html"><span>Previous</span>Chapter 3: Is a gene a fact or a call?</a><a class="next" href="chapter-5.html"><span>Next</span>Chapter 5: Gut bacteria and cardiovascular risk</a></nav></main></div>
+<script src="assets/book.js"></script></body></html>

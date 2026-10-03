@@ -1,0 +1,5 @@
+__pycache__/
+*.pass1.pdf
+# superseded raster infographics, kept locally only
+figures/original/
+figures/web/

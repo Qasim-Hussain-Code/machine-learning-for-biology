@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 412" class="figsvg">
+  <rect x="0" y="146" width="640" height="202" rx="10" class="fp"/>
+  <g font-size="22">
+    <text x="12" y="77" class="fm">Event earlier</text>
+    <text x="12" y="127" class="fm">Censored earlier</text>
+    <text x="12" y="183" class="fi">Event at this moment</text>
+    <text x="12" y="233" class="fi">Censored later</text>
+    <text x="12" y="283" class="fi">Event later</text>
+    <text x="12" y="330" class="fa">Still at risk at this moment</text>
+  </g>
+  <line x1="380" y1="40" x2="380" y2="372" class="si" stroke-width="1.5" stroke-dasharray="5 5"/>
+  <text x="380" y="26" font-size="22" text-anchor="middle" class="fi">The moment of one event</text>
+  <g stroke-width="4" stroke-linecap="round">
+    <line x1="246" y1="70" x2="290" y2="70" class="sm"/>
+    <line x1="246" y1="120" x2="336" y2="120" class="sm"/>
+    <line x1="246" y1="176" x2="380" y2="176" class="sa2"/>
+    <line x1="246" y1="226" x2="506" y2="226" class="sa"/>
+    <line x1="246" y1="276" x2="592" y2="276" class="sa"/>
+  </g>
+  <circle cx="290" cy="70" r="7" class="fm"/>
+  <circle cx="336" cy="120" r="7" class="fbg sm" stroke-width="3"/>
+  <circle cx="380" cy="176" r="10" class="fa2"/>
+  <circle cx="506" cy="226" r="7" class="fp sa" stroke-width="3"/>
+  <circle cx="592" cy="276" r="7" class="fa"/>
+  <text x="398" y="103" font-size="22" class="fm">Not in this comparison</text>
+  <text x="398" y="183" font-size="22" class="fa2">Should score highest</text>
+  <g class="si" stroke-width="1.5">
+    <line x1="246" y1="372" x2="616" y2="372"/>
+    <line x1="246" y1="364" x2="246" y2="380"/>
+  </g>
+  <polygon points="628,372 614,366 614,378" class="fi"/>
+  <g font-size="22" class="fm">
+    <text x="246" y="404" text-anchor="middle">Diagnosis</text>
+    <text x="628" y="404" text-anchor="end">Time since diagnosis</text>
+  </g>
+</svg>

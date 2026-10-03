@@ -1,0 +1,453 @@
+<!doctype html><html lang="en-GB" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Immune cell subtype discovery from single-cell RNA-seq · Machine Learning for Biology</title>
+<meta name="description" content="Machine Learning for Biology, a book by Qasim Hussain.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/book.css">
+<script>(function(){var r=document.documentElement;try{var s=localStorage.getItem('mlb-theme');if(s)r.dataset.theme=s;}catch(e){}})();</script>
+</head><body class="lay-sidebar hs-smallcaps justify">
+<a class="skip" href="#main">Skip to the text</a>
+<header class="topbar"><a class="tb-title" href="index.html">Machine Learning for Biology</a>
+<div class="tb-right"><a class="tb-ed" href="machine-learning-for-biology.pdf" aria-label="Download the print edition, PDF (2 MB)" title="Download the print edition, PDF (2 MB)">PDF</a><a class="tb-ed" href="machine-learning-for-biology.epub" download aria-label="Download the e-book edition, EPUB (0 MB)" title="Download the e-book edition, EPUB (0 MB)">EPUB</a><button class="modebtn" type="button" aria-label="Switch to light mode">Light<span class="wide"> mode</span></button></div></header>
+<div class="frame"><nav class="toc" aria-label="Contents"><details class="tocd" open><summary class="toch">Contents</summary><ol><li><a href="preface.html">Preface</a></li><li><a href="prologue.html">Prologue</a></li><li class="part">Part I · Learning from labels</li><li><a href="chapter-1.html"><span class="n">1</span> Predicting antibiotic resistance from a genome<span class="m">Logistic regression</span></a></li><li><a href="chapter-2.html"><span class="n">2</span> What does a cell show to the immune system?<span class="m">Decision tree</span></a></li><li><a href="chapter-3.html"><span class="n">3</span> Is a gene a fact or a call?<span class="m">Random forest</span></a></li><li><a href="chapter-4.html"><span class="n">4</span> What happens to the patients who are still alive?<span class="m">Gradient boosting</span></a></li><li><a href="chapter-5.html"><span class="n">5</span> Gut bacteria and cardiovascular risk<span class="m">Logistic regression (support vector machine planned)</span></a></li><li><a href="chapter-6.html"><span class="n">6</span> Neoantigen immunogenicity for cancer vaccine design<span class="m">Neural network</span></a></li><li class="part">Part II · Learning without labels</li><li class="on"><a href="chapter-7.html" aria-current="page"><span class="n">7</span> Immune cell subtype discovery from single-cell RNA-seq<span class="m">k-means</span></a><ol class="secs"><li><a href="#what-the-labels-can-and-cannot-see"><span class="sn">7.1</span>What the labels can and cannot see</a></li><li><a href="#what-k-means-does"><span class="sn">7.2</span>What k-means does</a></li><li><a href="#the-rules"><span class="sn">7.3</span>The rules</a></li><li><a href="#predictions-and-how-this-could-go-wrong"><span class="sn">7.4</span>Predictions, and how this could go wrong</a></li><li><a href="#before-the-key-opened"><span class="sn">7.5</span>Before the key opened</a></li><li><a href="#against-the-answer-key"><span class="sn">7.6</span>Against the answer key</a></li><li><a href="#the-six-predictions"><span class="sn">7.7</span>The six predictions</a></li></ol></li><li><a href="epilogue.html">Epilogue</a></li></ol><p class="tohome"><a href="index.html">Title page and contents</a></p></details></nav><main class="col" id="main"><header class="opener op-smallcaps"><p class="op-kicker">Chapter 7 · Part II · Learning without labels</p>
+<h1 class="op-title">Immune cell subtype discovery from single-cell RNA-seq</h1><p class="op-model">Model: k-means</p>
+<p class="op-question">Given only a cell’s gene expression, can an algorithm that has never seen a cell type label recover the immune cell populations a lab already knows are there?</p></header><section class="summary"><p class="sk">Summary</p><p>Blood cells from ten bead-enriched populations, 94,655 in all, were pooled with their labels locked away, and k-means was asked to group them from gene expression alone. Left to choose the number of groups by the silhouette, it chose 2, and the run fixed in advance lost to a baseline given only three numbers about how well each cell was measured, scoring 0.01 against 0.04 on the adjusted Rand index for the ten labels, although a different two-group split, found by 12 of 20 reruns from other starting points, scored 0.06 in a comparison not fixed in advance. Told to make ten groups, it scored 0.44 on the ten labels and 0.55 on six broad lineages, against 0.08 and 0.09 for the baseline. Four of six predictions written down in advance passed, and the helper T-cell tube did not separate from the naive T cells nested inside it, which argues against the groups being driven by the tubes.</p></section><div class="bodywrap"><p>Draw a tube of blood, spin it down, and the thin white layer in the middle holds T cells, B cells, NK cells, monocytes
+and dendritic cells, tangled together. Under a microscope, several of them look nearly identical.</p>
+<p>Every chapter before this one told the model the correct answer during training. Logistic regression knew which
+genomes carried resistance. The network in Chapter 6 knew which peptides provoked a response. The first chapter raised a
+different possibility and then left it alone for six chapters: biologists already sort cells into types without any of
+that supervision. This chapter is where that gets tested properly.</p>
+<p>The question is this. Given only a cell&rsquo;s gene expression, nothing else, can an algorithm that has never seen a cell
+type label recover the immune cell populations a lab already knows are there?</p>
+<p>The check is what makes the question answerable rather than just interesting. The cells used here were separated into
+ten populations by an entirely different method from transcriptomics. Those labels never touch the clustering. They
+exist only to be compared against afterwards (Figure 7.1).</p>
+<figure class="fig" id="fig-7-1"><svg role="img" aria-label="Two flow diagrams, one above the other. The upper one, headed Chapters 1 to 6, has data and labels both leading into a model, which leads to predictions. The lower one, headed This chapter, has gene expression leading into k-means, which leads to groups; the ten labels take a separate path beneath k-means, never entering it, and meet the groups only at a last box marked compared." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 368" class="figsvg">
+  <!-- Figure 7.1: where the labels go. Before this chapter they trained the model; here they go round it, to the comparison. -->
+  <g font-size="22" class="fm">
+    <text x="0" y="22">Chapters 1 to 6</text>
+    <text x="0" y="222">This chapter</text>
+  </g>
+
+  <g class="fp sl" stroke-width="1.5">
+    <rect x="1" y="38" width="178" height="48" rx="6"/>
+    <rect x="237" y="38" width="158" height="48" rx="6"/>
+    <rect x="453" y="38" width="186" height="48" rx="6"/>
+    <rect x="1" y="238" width="178" height="48" rx="6"/>
+    <rect x="237" y="238" width="158" height="48" rx="6"/>
+    <rect x="453" y="238" width="186" height="48" rx="6"/>
+    <rect x="453" y="318" width="186" height="48" rx="6"/>
+  </g>
+  <g class="fp sa" stroke-width="2">
+    <rect x="1" y="118" width="178" height="48" rx="6"/>
+    <rect x="1" y="318" width="178" height="48" rx="6"/>
+  </g>
+
+  <g class="sm" stroke-width="1.6">
+    <line x1="180" y1="62" x2="226" y2="62"/>
+    <line x1="396" y1="62" x2="442" y2="62"/>
+    <line x1="180" y1="262" x2="226" y2="262"/>
+    <line x1="396" y1="262" x2="442" y2="262"/>
+    <line x1="546" y1="287" x2="546" y2="307"/>
+  </g>
+  <g class="fm">
+    <polygon points="236,62 225,56 225,68"/>
+    <polygon points="452,62 441,56 441,68"/>
+    <polygon points="236,262 225,256 225,268"/>
+    <polygon points="452,262 441,256 441,268"/>
+    <polygon points="546,317 540,306 552,306"/>
+  </g>
+
+  <g class="fn sa" stroke-width="2">
+    <path d="M 180 142 H 316 V 98"/>
+    <path d="M 180 342 H 441"/>
+  </g>
+  <g class="fa">
+    <polygon points="316,87 310,99 322,99"/>
+    <polygon points="452,342 440,336 440,348"/>
+  </g>
+
+  <g font-size="22" class="fi" text-anchor="middle">
+    <text x="90" y="70">Data</text>
+    <text x="316" y="70">Model</text>
+    <text x="546" y="70">Predictions</text>
+    <text x="90" y="150">Labels</text>
+    <text x="90" y="270">Gene expression</text>
+    <text x="316" y="270">k-means</text>
+    <text x="546" y="270">Groups</text>
+    <text x="90" y="350">Ten labels</text>
+    <text x="546" y="350">Compared</text>
+  </g>
+</svg>
+<figcaption><b>Figure 7.1</b> Where the labels go. In Chapters 1 to 6, the labels went into training the model; in this chapter, k-means sees only gene expression, and the ten labels meet its groups only afterwards, when the two are compared.</figcaption></figure>
+
+<p>One limitation needs naming at the outset. Clustering finds structure, not names. It can group T cells together
+without knowing to call them T cells, and it can just as easily split one real population into two or merge two
+distinct ones, especially where the biology itself is gradual rather than discrete. Whatever comes out still needs a
+human, and marker genes, the genes that set one cell type apart from the rest, to say what each group actually is.</p>
+<h2 id="what-the-labels-can-and-cannot-see"><span class="secno">7.1</span> What the labels can and cannot see</h2>
+<p>The ten populations were pulled out of one donor&rsquo;s blood with antibody-coated beads, and flow cytometry came in only
+afterwards, to check how pure each tube was. So every label here, the whole answer key, was made with an antibody
+against a protein on the cell surface: CD4, CD8, CD14, CD19, CD25, CD34, CD45RA, CD45RO and CD56.</p>
+<p>The algorithm will never see a protein. It sees RNA, counted from the tail end of each message. Proteins and messages
+usually agree. In these cells there are three places where they do not.</p>
+<p>One label is close to invisible. Naive and memory T cells were separated using CD45RA versus CD45RO. Those are not two
+genes. They are two versions of one gene, <em>PTPRC</em>, made by cutting different pieces out of the same message, and those
+pieces sit near the front, far from the tail this chemistry reads. A 2024 study tested exactly this on tail-end data
+from blood cells: even with very deep sequencing, fewer than one cell in ten showed either version.</p>
+<p>Some labels overlap by definition. The helper T cells were selected on CD4 alone. Naive, memory and regulatory T cells
+all carry CD4, so the helper tube holds cells that match three other labels. The two CD8 populations, cytotoxic and
+naive, nest in the same way, with a twist: some of the most experienced killer T cells switch CD45RA back on, so
+&ldquo;naive&rdquo; here is not purely naive.</p>
+<p>One label is mostly something else. By the dataset&rsquo;s own flow check, the CD34+ tube was 45% pure.</p>
+<p>In Chapter 5, the gene did not follow the organism. Here the label does not fully follow the RNA.</p>
+<p>One decision was made before any code ran, rather than after a disappointing score. The results would be scored against
+two answer keys. The first is the ten labels, one per tube: B cells, monocytes, NK cells, CD34+ cells and six T-cell
+labels, four of CD4 T cells (helper, naive, memory and regulatory) and two of CD8 T cells (cytotoxic and naive). The
+second is six broad lineages: B cells, monocytes, NK cells, CD34+ progenitors, CD4 T cells and CD8 T cells, so that the
+four CD4 T-cell tubes become one family. Both were declared in advance, so neither could be chosen later to flatter the
+result.</p>
+<h2 id="what-k-means-does"><span class="secno">7.2</span> What k-means does</h2>
+<p>Each cell starts as counts for thousands of genes. Many of those genes rise and fall together, so they can be squeezed
+into 50 combined axes that keep the main patterns. That squeeze is called principal component analysis. Now picture
+every cell as a point in a space with those 50 directions. Similar cells sit close together.</p>
+<p>k-means drops k markers into that space. Every cell joins its nearest marker. Each marker then moves to the middle of
+the cells that joined it. Cells switch to whichever marker is now nearest, and the process repeats until nothing moves.</p>
+<p>That is the whole algorithm. There is no answer key anywhere. The one instruction it gets is k, the number of groups
+(Figure 7.2).</p>
+<figure class="fig" id="fig-7-2"><svg role="img" aria-label="Three square panels of the same scattered points, joined by arrows. In the first, labelled drop k markers into the space, the points are hollow and three diamond markers sit near the edges. In the second, labelled each cell joins its nearest marker, every point is filled in the colour of its nearest marker, making three groups. In the third, labelled each marker moves to the middle, each marker has moved from where it started, now a dashed outline, to the middle of its group. An arrow from the third panel back to the second is labelled repeat until nothing moves." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 322" class="figsvg">
+  <!-- Figure 7.2: one round of k-means on a sketch, not the chapter's data. Every point joins its true nearest marker,
+       each marker moves to the exact mean of its points, and a second round would change nothing. -->
+  <text x="433" y="22" font-size="22" class="fm" text-anchor="middle">Repeat until nothing moves</text>
+  <path d="M 546 64 V 38 H 320 V 52" class="fn sm" stroke-width="1.6"/>
+  <polygon points="320,63 314,51 326,51" class="fm"/>
+
+  <g class="fp">
+    <rect x="0" y="64" width="188" height="188" rx="8"/>
+    <rect x="226" y="64" width="188" height="188" rx="8"/>
+    <rect x="452" y="64" width="188" height="188" rx="8"/>
+  </g>
+  <g class="sm" stroke-width="1.6">
+    <line x1="194" y1="158" x2="210" y2="158"/>
+    <line x1="420" y1="158" x2="436" y2="158"/>
+  </g>
+  <g class="fm">
+    <polygon points="221,158 209,152 209,164"/>
+    <polygon points="447,158 435,152 435,164"/>
+  </g>
+
+  <!-- 1: cells not yet in any group, markers dropped -->
+  <g transform="translate(0 64)">
+    <g class="fn sm" stroke-width="1.6">
+      <circle cx="66.6" cy="40.1" r="5.5"/><circle cx="53.0" cy="88.0" r="5.5"/><circle cx="28.1" cy="66.5" r="5.5"/><circle cx="74.6" cy="61.7" r="5.5"/>
+      <circle cx="49.3" cy="31.7" r="5.5"/><circle cx="25.3" cy="47.4" r="5.5"/><circle cx="39.5" cy="79.0" r="5.5"/><circle cx="64.0" cy="76.1" r="5.5"/>
+      <circle cx="143.2" cy="94.4" r="5.5"/><circle cx="111.8" cy="46.4" r="5.5"/><circle cx="115.3" cy="86.6" r="5.5"/><circle cx="160.0" cy="43.4" r="5.5"/>
+      <circle cx="156.5" cy="69.2" r="5.5"/><circle cx="105.7" cy="72.2" r="5.5"/><circle cx="141.6" cy="40.2" r="5.5"/><circle cx="159.2" cy="85.6" r="5.5"/>
+      <circle cx="70.2" cy="151.5" r="5.5"/><circle cx="87.9" cy="156.6" r="5.5"/><circle cx="93.9" cy="112.0" r="5.5"/><circle cx="120.4" cy="139.5" r="5.5"/>
+      <circle cx="71.4" cy="118.3" r="5.5"/><circle cx="102.2" cy="165.5" r="5.5"/><circle cx="110.8" cy="114.6" r="5.5"/><circle cx="63.5" cy="133.9" r="5.5"/>
+    </g>
+    <g class="si" stroke-width="1.6">
+      <path d="M 24 12 L 36 24 L 24 36 L 12 24 Z" class="fa"/>
+      <path d="M 170 12 L 182 24 L 170 36 L 158 24 Z" class="fa2"/>
+      <path d="M 52 158 L 64 170 L 52 182 L 40 170 Z" class="fi"/>
+    </g>
+  </g>
+
+  <!-- 2: each cell joins its nearest marker -->
+  <g transform="translate(226 64)">
+    <g class="fa">
+      <circle cx="66.6" cy="40.1" r="5.5"/><circle cx="53.0" cy="88.0" r="5.5"/><circle cx="28.1" cy="66.5" r="5.5"/><circle cx="74.6" cy="61.7" r="5.5"/>
+      <circle cx="49.3" cy="31.7" r="5.5"/><circle cx="25.3" cy="47.4" r="5.5"/><circle cx="39.5" cy="79.0" r="5.5"/><circle cx="64.0" cy="76.1" r="5.5"/>
+    </g>
+    <g class="fa2">
+      <circle cx="143.2" cy="94.4" r="5.5"/><circle cx="111.8" cy="46.4" r="5.5"/><circle cx="115.3" cy="86.6" r="5.5"/><circle cx="160.0" cy="43.4" r="5.5"/>
+      <circle cx="156.5" cy="69.2" r="5.5"/><circle cx="105.7" cy="72.2" r="5.5"/><circle cx="141.6" cy="40.2" r="5.5"/><circle cx="159.2" cy="85.6" r="5.5"/>
+    </g>
+    <g class="fi">
+      <circle cx="70.2" cy="151.5" r="5.5"/><circle cx="87.9" cy="156.6" r="5.5"/><circle cx="93.9" cy="112.0" r="5.5"/><circle cx="120.4" cy="139.5" r="5.5"/>
+      <circle cx="71.4" cy="118.3" r="5.5"/><circle cx="102.2" cy="165.5" r="5.5"/><circle cx="110.8" cy="114.6" r="5.5"/><circle cx="63.5" cy="133.9" r="5.5"/>
+    </g>
+    <g class="si" stroke-width="1.6">
+      <path d="M 24 12 L 36 24 L 24 36 L 12 24 Z" class="fa"/>
+      <path d="M 170 12 L 182 24 L 170 36 L 158 24 Z" class="fa2"/>
+      <path d="M 52 158 L 64 170 L 52 182 L 40 170 Z" class="fi"/>
+    </g>
+  </g>
+
+  <!-- 3: each marker moves to the mean of its cells (50.0, 61.3), (136.7, 67.2), (90.0, 136.5) -->
+  <g transform="translate(452 64)">
+    <g class="fa">
+      <circle cx="66.6" cy="40.1" r="5.5"/><circle cx="53.0" cy="88.0" r="5.5"/><circle cx="28.1" cy="66.5" r="5.5"/><circle cx="74.6" cy="61.7" r="5.5"/>
+      <circle cx="49.3" cy="31.7" r="5.5"/><circle cx="25.3" cy="47.4" r="5.5"/><circle cx="39.5" cy="79.0" r="5.5"/><circle cx="64.0" cy="76.1" r="5.5"/>
+    </g>
+    <g class="fa2">
+      <circle cx="143.2" cy="94.4" r="5.5"/><circle cx="111.8" cy="46.4" r="5.5"/><circle cx="115.3" cy="86.6" r="5.5"/><circle cx="160.0" cy="43.4" r="5.5"/>
+      <circle cx="156.5" cy="69.2" r="5.5"/><circle cx="105.7" cy="72.2" r="5.5"/><circle cx="141.6" cy="40.2" r="5.5"/><circle cx="159.2" cy="85.6" r="5.5"/>
+    </g>
+    <g class="fi">
+      <circle cx="70.2" cy="151.5" r="5.5"/><circle cx="87.9" cy="156.6" r="5.5"/><circle cx="93.9" cy="112.0" r="5.5"/><circle cx="120.4" cy="139.5" r="5.5"/>
+      <circle cx="71.4" cy="118.3" r="5.5"/><circle cx="102.2" cy="165.5" r="5.5"/><circle cx="110.8" cy="114.6" r="5.5"/><circle cx="63.5" cy="133.9" r="5.5"/>
+    </g>
+    <g class="fn" stroke-width="1.4" stroke-dasharray="3 3">
+      <path d="M 24 12 L 36 24 L 24 36 L 12 24 Z" class="sa"/>
+      <path d="M 170 12 L 182 24 L 170 36 L 158 24 Z" class="sa2"/>
+      <path d="M 52 158 L 64 170 L 52 182 L 40 170 Z" class="si"/>
+    </g>
+    <g class="si" stroke-width="1.6">
+      <path d="M 50.0 49.3 L 62.0 61.3 L 50.0 73.3 L 38.0 61.3 Z" class="fa"/>
+      <path d="M 136.7 55.2 L 148.7 67.2 L 136.7 79.2 L 124.7 67.2 Z" class="fa2"/>
+      <path d="M 90.0 124.5 L 102.0 136.5 L 90.0 148.5 L 78.0 136.5 Z" class="fi"/>
+    </g>
+  </g>
+
+  <g font-size="22" class="fi" text-anchor="middle">
+    <text x="94" y="286">Drop k markers</text>
+    <text x="94" y="312">into the space</text>
+    <text x="320" y="286">Each cell joins</text>
+    <text x="320" y="312">its nearest marker</text>
+    <text x="546" y="286">Each marker moves</text>
+    <text x="546" y="312">to the middle</text>
+  </g>
+</svg>
+<figcaption><b>Figure 7.2</b> One round of k-means with three markers, drawn on a sketch rather than the chapter’s data; each point stands for a cell. Markers are dropped into the space, each cell joins its nearest marker, and each marker moves to the middle of the cells that joined it; k, the number of groups, is the one instruction the method is given.</figcaption></figure>
+
+<p>Chapter 5 set out to use a support vector machine, a model that searches for the widest gap between two outcomes it has
+been told about. k-means has no outcomes. It decides where the gaps are on its own.</p>
+<p>It is not a toy choice for this data. The 2017 study that produced these cells clustered with k-means, on 50 principal
+components, and for its 68,000-cell blood sample it set k to 10 after reading an error curve. Reading a curve like that
+is a judgement call made after seeing the data. This chapter replaces it with a rule fixed in advance.</p>
+<p>There are two reasons k-means closes the book. It is the plainest version of the idea, the unsupervised counterpart to
+Chapter 1&rsquo;s logistic regression. And it drags the most important decision into the open: how many groups are there?
+Most methods answer that quietly, inside a setting. k-means will not start until someone answers it.</p>
+<p>One weakness shows up at the start line. Where the markers begin can change where they finish. So every run starts from
+50 different random positions and keeps the tightest result.</p>
+<p>k-means is not what single-cell labs usually reach for. Seurat and Scanpy, two of the most widely used toolkits, default
+to graph-based clustering: link each cell to its nearest neighbours, then find communities more tightly linked inside
+than out. The version used here is called Leiden. It needs no k, only a resolution dial that does the same job less
+visibly. Leiden ran alongside k-means, its dial set by the same rule that picks k. If the textbook method lost to the
+field&rsquo;s default, that would be reported too.</p>
+<h2 id="the-rules"><span class="secno">7.3</span> The rules</h2>
+<p>The rules were fixed before any code ran.</p>
+<div class="rules"><p class="rh">Rules for this chapter</p>
+<p><strong>Data.</strong> The ten bead-enriched populations released by 10x Genomics alongside Zheng and colleagues, <em>Nature
+Communications</em>, 2017. Every cell the original pipeline called a cell, pooled into one table. Nothing removed on top by
+thresholds of my choosing.</p>
+<p><strong>Answer key.</strong> It goes in a locked drawer. At the very first step the labels move to a separate file, every cell gets a
+random code in place of its name, and the order is shuffled. No script that groups cells may open that file. It opens
+once, after the groups are final and committed to the repository.</p>
+<p><strong>Input.</strong> Gene expression and nothing else. The settings are borrowed, not tuned: the processing recipe from the
+2017 paper, which the Scanpy library ships under that paper&rsquo;s name. The 1,000 most variable genes, squeezed to 50 axes.
+No correction for sequencing batch, because each tube was measured separately: here batch and label are the same thing,
+and correcting for one would erase the other.</p>
+<p><strong>Number of groups.</strong> Anything from 2 to 20 is allowed. The winner is the number where cells sit most clearly
+inside their own group rather than the next one over, a measure called the silhouette, and the same rule sets Leiden&rsquo;s
+dial. The number is never set to ten just because the key says ten. One extra run, labelled as borrowing from the key,
+forces ten groups, so that a wrong count can be told apart from a wrong grouping.</p>
+<p><strong>Metric.</strong> The adjusted Rand index, against the ten labels and against the six lineages, with a 95% confidence
+interval. Its zero point is checked by shuffling the key 1,000 times.</p>
+<p><strong>Baseline.</strong> The same model, fed three numbers per cell that describe the measurement rather than the cell: molecules
+captured, genes detected and the share of molecules from mitochondrial genes. Gene expression beats it only if the
+whole 95% interval for its lead sits above zero. If gene expression cannot clearly beat it, the groups describe the
+machine.</p>
+<p><strong>Names before answers.</strong> Before the key opens, each group of the k-means run that chooses its own number gets a name
+from its marker genes, twice: once by a fixed rule written down in advance, once by me. Both are committed, then
+scored.</p>
+<p><strong>Everything on record.</strong> Every setting, down to the random seed, goes into the repository before the analysis starts,
+along with a pass-or-fail test for each prediction.</p>
+</div>
+<aside class="note">
+<p><strong>Adjusted Rand index.</strong> A measure of how far two ways of grouping the same cells agree,
+judged by whether each pair of cells is kept together or kept apart in both. The groups need no names, and the two
+groupings need not have the same number of groups. 0 is what random grouping scores on average, and 1 is perfect
+agreement.</p>
+</aside>
+<p>The locked drawer is a few lines of code in the script that builds the pooled table (Listing 7.1). Figure 7.3 sets out
+the protocol as a whole.</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 7.1</b> Shuffling, renaming and setting the labels aside, from <code>scripts/02_build_matrix.py</code>.</span></summary><pre tabindex="0"><code class="language-python">    counts = sp.vstack(blocks, format=&quot;csr&quot;)
+    order = rng(cfg[&quot;rng_streams&quot;][&quot;shuffle&quot;]).permutation(counts.shape[0])
+    counts = counts[order]
+    keys = np.asarray(keys)[order]
+    barcodes = np.asarray(barcodes)[order]
+    ids = [f&quot;c{i:06d}&quot; for i in range(1, counts.shape[0] + 1)]
+
+    obs = pd.DataFrame(index=pd.Index(ids))
+    var_out = pd.DataFrame({&quot;gene_symbols&quot;: var[&quot;gene_symbols&quot;].to_numpy()}, index=pd.Index(var.index.to_numpy()))
+    pooled = ad.AnnData(X=counts, obs=obs, var=var_out)
+    pooled.uns.clear()
+    for column in list(pooled.obs.columns):
+        del pooled.obs[column]
+    pooled_path = ROOT / qcfg[&quot;pooled_file&quot;]
+    pooled_path.parent.mkdir(parents=True, exist_ok=True)
+    pooled.write_h5ad(pooled_path, compression=&quot;gzip&quot;)
+
+    labels_path = ROOT / qcfg[&quot;labels_file&quot;]
+    pd.DataFrame({&quot;cell_id&quot;: ids, &quot;population_key&quot;: keys, &quot;original_barcode&quot;: barcodes}).to_csv(labels_path, index=False, lineterminator=&quot;\n&quot;)
+</code></pre></details>
+<figure class="fig" id="fig-7-3"><svg role="img" aria-label="Six steps on a vertical line. First, settings and pass-or-fail tests committed. Then, inside a box marked answer key locked away: labels moved to a separate file, cells recoded and shuffled; gene expression only, squeezed to 50 axes; the silhouette picks k, from 2 to 20; groups named from marker genes and committed. Last, below the box: the key opens once, and the groups are scored." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" class="figsvg">
+  <!-- Figure 7.3: the protocol in order. Steps 2 to 5 run while the answer key is locked away; it opens once, at the end. -->
+  <rect x="1" y="54" width="638" height="246" rx="8" class="fp sa" stroke-width="2"/>
+  <line x1="26" y1="24" x2="26" y2="333" class="sm" stroke-width="2"/>
+  <g class="fi">
+    <circle cx="26" cy="24" r="7"/>
+    <circle cx="26" cy="127" r="7"/>
+    <circle cx="26" cy="173" r="7"/>
+    <circle cx="26" cy="219" r="7"/>
+    <circle cx="26" cy="265" r="7"/>
+  </g>
+  <circle cx="26" cy="333" r="7" class="fa"/>
+
+  <text x="52" y="88" font-size="22" class="fa">Answer key locked away</text>
+  <g font-size="22" class="fi">
+    <text x="52" y="31">Settings and pass-or-fail tests committed</text>
+    <text x="52" y="134">Labels moved to a separate file; cells recoded and shuffled</text>
+    <text x="52" y="180">Gene expression only, squeezed to <tspan class="num" font-size="24">50</tspan> axes</text>
+    <text x="52" y="226">The silhouette picks k, from <tspan class="num" font-size="24">2</tspan> to <tspan class="num" font-size="24">20</tspan></text>
+    <text x="52" y="272">Groups named from marker genes and committed</text>
+    <text x="52" y="340">The key opens once, and the groups are scored</text>
+  </g>
+</svg>
+<figcaption><b>Figure 7.3</b> The protocol in order. The settings and the pass-or-fail tests are committed first; the next four steps, from moving the labels to a separate file to naming the groups, run while the answer key is locked away; and the key opens once, at the end, to score the groups.</figcaption></figure>
+
+<h2 id="predictions-and-how-this-could-go-wrong"><span class="secno">7.4</span> Predictions, and how this could go wrong</h2>
+<p>I wrote down predictions before any code ran. They were not blind: others had clustered these cells before. B cells
+and monocytes would come back largely intact. NK cells would partly blur into cytotoxic T cells, because both run the
+same killing programme. The six T-cell labels would not separate cleanly, and the helper label could not separate from
+the populations nested inside it. The CD34+ label would mostly hold together, as it did in a 2020 re-analysis. That is
+odd for a tube that is 45% pure, and odd results get checked against the sequencing batch first.</p>
+<p>I also set out the ways the chapter could go wrong, each with a check.</p>
+<p>The first is that it might sort cells by the tube they came in. Imagine ten piles of holiday photos, each taken with a
+different camera. Ask someone to sort them by who is in them, and they might sort them by camera instead, because one
+camera&rsquo;s photos are brighter and another&rsquo;s are blurrier. The same risk exists here. Each cell type arrived in its own
+tube and was measured separately, some far more thoroughly than others. The check is the baseline in the rules. Its
+three numbers are the &ldquo;camera settings&rdquo;: they say how well each cell was measured and nothing about the cell itself.
+The real data has to clearly beat them. If it cannot, the groups are about the camera, not the people. A second check
+uses the helper T cells. That tube was collected with a broad net, so it already holds many cells from another tube,
+the naive T cells. Those two should be hard to separate. If the computer separates them more easily than two tubes that
+really are different, it is sorting by tube.</p>
+<p>The second is that it might count wrong but sort right. The computer decides how many groups there are by looking for
+the cleanest splits. In blood, the cleanest splits are the big ones, so it may find three or four groups where the lab
+defined ten. The check is to publish its score for every group count from 2 to 20, plus one extra run told to make ten.</p>
+<p>The third is that it never says &ldquo;I am not sure&rdquo;. Every cell must go into some group, even cells caught halfway through
+changing from one type to another. And where the computer starts is random, which can change where it ends. The check
+is to run it 20 times from different starting points and to compare it with Leiden.</p>
+<p>The fourth is that a strange group is not a discovery. A group that matches no label might be a new cell type. It is
+just as likely to be stray cells, two cells stuck together, or dying cells. Any such group is called &ldquo;unresolved&rdquo; and
+its genes are listed. No new cell types will be claimed.</p>
+<h2 id="before-the-key-opened"><span class="secno">7.5</span> Before the key opened</h2>
+<p>Everything in this section was frozen and committed to the repository before the answer key opened.</p>
+<p>94,655 blood cells went in. Each one was just a list of gene counts, with no names attached. The processing recipe,
+asked for the 1,000 most variable genes, returned 999, and I used its output as it was. The first job was to decide how
+many groups to make. The rule tried every number from 2 to 20 and kept the one where cells sat most clearly inside their
+own group (Listing 7.2).</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 7.2</b> The rule that chooses the number of groups, from <code>scripts/04_select_k.py</code>.</span></summary><pre tabindex="0"><code class="language-python">def pick(values, scores):
+    &quot;&quot;&quot;Highest score after rounding to 4 decimal places; ties go to the smallest k or lowest resolution.&quot;&quot;&quot;
+    rounded = {v: round(s, 4) for v, s in zip(values, scores) if s is not None}
+    best = max(rounded.values())
+    return min(v for v, s in rounded.items() if s == best)
+</code></pre></details>
+<p>It picked 2. Not ten, and not six. One group of 3,521 cells full of monocyte genes, and one group of 91,134 cells
+holding everything else. This is what the second risk warned about: in blood, the cleanest split is a coarse
+one. The silhouette for two groups was 0.63. For ten groups it was 0.21.</p>
+<p>So the extra run, the one told to make exactly ten groups, came to matter a great deal. On their marker genes, its
+groups look like real cell families: B cells, NK cells, monocytes, several kinds of T cells and three separate groups
+the naming rule called CD34+ progenitors. Leiden, the kind of method most labs use, settled on 23 groups.</p>
+<p>Then came the 20 reruns from different random starting points. Leiden gave much the same answer each time. k-means did
+not. At two groups, 12 of the 20 reruns found a different split from the run fixed in advance, and a slightly tighter
+one, with 83,404 cells in one group and 11,251 in the other. The rules say the pre-committed run is the one that gets
+scored, so it is. The other answer is reported next to it.</p>
+<p>Finally, the two groups k-means chose for itself were named from their genes, twice. The fixed rule called the big group
+&ldquo;CD8 T cells&rdquo;. The second naming, the one I had said I would do myself, worked from the same marker genes before the key
+opened, and called the big group &ldquo;unresolved&rdquo;: a mix of several cell types. The fixed rule also named every group of
+the ten-group run and of Leiden.</p>
+<h2 id="against-the-answer-key"><span class="secno">7.6</span> Against the answer key</h2>
+<p>Every grouping beat random easily. I shuffled the labels 1,000 times, and the highest any shuffle scored was 0.003.</p>
+<p>That was the warm-up. The real test was the camera-settings baseline: the same method, k-means, given only the three
+numbers about how well each cell was measured.</p>
+<p>At the two groups k-means chose for itself, gene expression lost. On the ten labels it scored 0.01 and the camera
+settings 0.04. On the six lineages it scored 0.05 and the camera settings 0.13. The reason is almost boring. Gene
+expression split off a small group, mostly monocytes. The camera settings split off the cells that gave the most RNA.
+The CD34+ tube gave far more RNA per cell than any other, so 89% of it landed in that group. Against the labels, the
+camera-settings split happens to score better.</p>
+<p>The other two-group answer did better. The split that 12 of the 20 reruns found scored 0.06 on the ten labels and 0.18
+on the six lineages, above the camera settings&rsquo; 0.04 and 0.13. That comparison was not part of the plan and has no
+interval, so the verdict still rests on the run fixed in advance.</p>
+<p>Then I told k-means to make ten groups, the same number as the lab&rsquo;s labels. This time gene expression won clearly: 0.44
+against 0.08 on the ten labels, and 0.55 against 0.09 on the six lineages.</p>
+<p>Leiden, with its 23 groups chosen by the same rule, beat two-group k-means on both keys, with 0.58 on the ten labels
+and 0.42 on the six lineages. Against ten-group k-means it was a split decision. Leiden scored higher on the ten labels,
+0.58 against 0.44, and k-means scored higher on the six lineages, 0.55 against 0.42. That comparison was not planned in
+advance, so it stays a description rather than a verdict.</p>
+<p>The result fits in two sentences. When k-means has to decide how many groups exist, it gets the count wrong, and the
+camera settings beat it. When it is told the count, it recovers a large part of the lab&rsquo;s structure from RNA alone. The
+second risk in my list was &ldquo;count wrong but sort right&rdquo;, and that is what happened.</p>
+<p>The names were scored too. A name counted as correct if it matched the group&rsquo;s most common lineage, where that lineage
+made up at least half of the group, or if it said &ldquo;unresolved&rdquo; where no lineage did. The big group k-means chose for
+itself was only 46% CD4 T cells, its most common lineage, so &ldquo;unresolved&rdquo; was the right name and &ldquo;CD8 T cells&rdquo; was
+wrong. The fixed rule got 1 of those 2 groups right, and my second naming got both. My naming covered only those two
+groups, so its perfect score is a small test. On the ten-group run, the fixed rule named 9 of 10 groups correctly, and
+on Leiden, 17 of 23. Every group it missed on those two runs was a small one.</p>
+<h2 id="the-six-predictions"><span class="secno">7.7</span> The six predictions</h2>
+<aside class="note">
+<p><strong>Overlap and pair score.</strong> The overlap of two labels adds up, over every group, the
+smaller of two shares: the share of the first label&rsquo;s cells that sit in that group, and the share of the second
+label&rsquo;s cells that sit there. It is 0 when the two labels never share a group, and 1 when they are spread across the
+groups in exactly the same way. The pair score is the adjusted Rand index computed on only the cells that carry one of
+the two labels, so it measures how cleanly the groups separate those two labels.</p>
+</aside>
+<p>The predictions were scored on the run told to make ten groups, because they are about ten labels. Four passed. Two
+failed (Figure 7.4).</p>
+<p>B cells came back intact, a pass. 99.9% of them landed in one group, and that group was 96% B cells. Monocytes also
+passed: 93% of them landed in one group.</p>
+<p>The NK-cell prediction failed. It needed an overlap with cytotoxic T cells of at least 0.10, and the overlap came out at
+0.05. Sharing a killing programme was not enough to mix them: 98% of NK cells sat in one group that was 96% NK cells.</p>
+<p>The CD34+ prediction also failed, and it is the most interesting miss. The tube did not scatter into other cell types.
+Most of it split into three groups of its own, each more than 98% cells from the CD34+ tube. But its biggest single
+group held only 30% of it, far short of the 80% needed. This was the one prediction shaped by the 2020 re-analysis,
+where most of these cells stayed in one cluster.</p>
+<p>The predictions said odd results get checked against the sequencing batch first, and this result is odd in that way: a
+tube that was 45% pure kept most of its cells in groups of its own. In the biggest of those groups, 34% of cells had at
+least one count of the <em>CD34</em> gene, against 2% of all the cells outside it, so that group does carry the <em>CD34</em> message.
+Among cells from the CD34+ tube, the share was 34% inside that group and 32% outside it. By this measure, the tube&rsquo;s
+cells outside its biggest group resemble the ones inside it rather than contaminants. What the check cannot do is
+separate the cells from their run. The camera settings alone kept much of the tube together: 89% of it in one group at
+two groups, and 54% at ten. Batch and label are the same thing here, so nothing in this chapter can tell how far the
+tube stands apart because of its cells and how far because of its run.</p>
+<p>The six T-cell labels did not separate cleanly, a pass. Not one of them got a group holding 80% of its cells at 80%
+purity.</p>
+<p>The last prediction is the one that matters most: the helper tube could not be pulled apart from the naive T cells
+inside it. It passed. Helper against naive separated with a pair score of 0.05. Naive against memory, two genuinely
+different kinds of T cell, separated at 0.49. If the tubes, rather than the cells, had been driving the groups, that
+order would have flipped. It did not.</p>
+<figure class="fig" id="fig-7-4"><svg role="img" aria-label="Two lists. Under four passed: B cells come back largely intact, 99.9% in one group, which was 96% B cells; monocytes come back largely intact, 93% in one group; the six T-cell labels do not separate cleanly: none got a group with 80% of its cells at 80% purity; the helper tube does not separate from naive T cells, pair score 0.05 against 0.49 for naive and memory. Under two failed: NK cells partly blur into cytotoxic T cells, overlap 0.05 where at least 0.10 was needed; the CD34+ tube mostly holds together: its biggest group held 30% of it where 80% was needed." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 494" class="figsvg">
+  <!-- Figure 7.4: the six predictions, scored on the run told to make ten groups. Each row gives the prediction as
+       written in advance and the number that decided it. -->
+  <text x="0" y="24" font-size="24" class="fa">Four passed</text>
+  <rect x="0" y="44" width="6" height="254" class="fa"/>
+  <g font-size="22" class="fi">
+    <text x="24" y="64">B cells come back largely intact<tspan x="24" dy="28" class="fm"><tspan class="fi num" font-size="24">99.9%</tspan> in one group, which was <tspan class="fi num" font-size="24">96%</tspan> B cells</tspan></text>
+    <text x="24" y="130">Monocytes come back largely intact<tspan x="24" dy="28" class="fm"><tspan class="fi num" font-size="24">93%</tspan> in one group</tspan></text>
+    <text x="24" y="196">The six T-cell labels do not separate cleanly<tspan x="24" dy="28" class="fm">None got a group with <tspan class="fi num" font-size="24">80%</tspan> of its cells at <tspan class="fi num" font-size="24">80%</tspan> purity</tspan></text>
+    <text x="24" y="262">The helper tube does not separate from naive T cells<tspan x="24" dy="28" class="fm">Pair score <tspan class="fi num" font-size="24">0.05</tspan>, against <tspan class="fi num" font-size="24">0.49</tspan> for naive and memory</tspan></text>
+  </g>
+
+  <text x="0" y="350" font-size="24" class="fb">Two failed</text>
+  <rect x="0" y="370" width="6" height="122" class="fb"/>
+  <g font-size="22" class="fi">
+    <text x="24" y="390">NK cells partly blur into cytotoxic T cells<tspan x="24" dy="28" class="fm">Overlap <tspan class="fi num" font-size="24">0.05</tspan>, needed at least <tspan class="fi num" font-size="24">0.10</tspan></tspan></text>
+    <text x="24" y="456">The CD34+ tube mostly holds together<tspan x="24" dy="28" class="fm">Its biggest group held <tspan class="fi num" font-size="24">30%</tspan> of it, needed <tspan class="fi num" font-size="24">80%</tspan></tspan></text>
+  </g>
+</svg>
+<figcaption><b>Figure 7.4</b> The six predictions, scored on the run told to make ten groups, each with the number that decided it. The low overlap means NK and cytotoxic T cells stayed apart, so that prediction failed; the equally low pair score means the helper and naive tubes did not separate, so that one passed.</figcaption></figure>
+
+<p>Because others had clustered these cells before, B cells and monocytes were safe calls. The two misses are the reason
+predictions get written down first. Without a record made before any code ran, it would be easy to claim afterwards that
+these results were expected.</p>
+<p class="prov">This chapter is rewritten from the posts for Days 62 to 69 of the series.</p>
+
+<h2 id="references">References</h2>
+<p>Zheng, G. X. Y., Terry, J. M., Belgrader, P. et al. (2017). Massively parallel digital transcriptional profiling of
+single cells. <em>Nature Communications</em>, 8, 14049. <a href="https://doi.org/10.1038/ncomms14049">https://doi.org/10.1038/ncomms14049</a></p></div><section class="endm"><div class="run"><p class="eh">Run it</p>
+<p><span class="lbl">Repository</span> <a href="https://github.com/Qasim-Hussain-Code/immune_cell_subtype_discovery">immune_cell_subtype_discovery</a></p>
+<p><span class="lbl">Commit</span> <a href="https://github.com/Qasim-Hussain-Code/immune_cell_subtype_discovery/tree/1141fa411573"><code>1141fa411573</code></a></p></div>
+<div class="cite"><p class="eh">Cite this chapter</p><p>Hussain, Q. (2026). Immune cell subtype discovery from single-cell RNA-seq. In <i>Machine Learning for Biology</i>, chapter 7.</p></div></section><nav class="pn" aria-label="Previous and next"><a class="prev" href="chapter-6.html"><span>Previous</span>Chapter 6: Neoantigen immunogenicity for cancer vaccine design</a><a class="next" href="epilogue.html"><span>Next</span>Epilogue</a></nav></main></div>
+<script src="assets/book.js"></script></body></html>

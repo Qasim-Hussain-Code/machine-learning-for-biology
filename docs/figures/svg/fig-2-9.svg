@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 282" class="figsvg">
+  <text x="318" y="28" font-size="22" text-anchor="middle" class="fa2"><tspan class="num">500</tspan>-nanomolar threshold</text>
+  <line x1="318" y1="42" x2="318" y2="138" class="sa2" stroke-width="2"/>
+
+  <g class="fi num" font-size="24" text-anchor="middle">
+    <text x="141.6" y="92">200</text>
+    <text x="259.2" y="92">400</text>
+    <text x="553.2" y="92">900</text>
+  </g>
+  <line x1="24" y1="120" x2="612" y2="120" class="sm" stroke-width="1.5"/>
+  <g class="fa">
+    <circle cx="141.6" cy="120" r="9"/>
+    <circle cx="259.2" cy="120" r="9"/>
+  </g>
+  <circle cx="553.2" cy="120" r="9" class="fm"/>
+  <circle cx="259.2" cy="120" r="18" class="fn sa" stroke-width="3"/>
+
+  <g class="sm" stroke-width="1.2">
+    <line x1="24" y1="120" x2="24" y2="130"/><line x1="171" y1="120" x2="171" y2="130"/>
+    <line x1="318" y1="120" x2="318" y2="130"/><line x1="465" y1="120" x2="465" y2="130"/>
+    <line x1="612" y1="120" x2="612" y2="130"/>
+  </g>
+  <g class="fm num" font-size="22" text-anchor="middle">
+    <text x="24" y="158">0</text><text x="171" y="158">250</text><text x="318" y="158">500</text>
+    <text x="465" y="158">750</text><text x="612" y="158">1000</text>
+  </g>
+  <text x="259.2" y="192" font-size="22" text-anchor="middle" class="fa">median</text>
+  <text x="612" y="192" font-size="22" text-anchor="end" class="fm">nanomolar</text>
+
+  <text x="320" y="252" font-size="23" text-anchor="middle" class="fi">The median is <tspan class="num">400</tspan>, so the peptide is labelled a binder.</text>
+</svg>

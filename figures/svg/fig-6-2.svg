@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 388" class="figsvg">
+  <!-- Figure 6.2: the question is asked inside the set of confirmed binders, and narrows to the held out core. -->
+  <rect x="10" y="10" width="620" height="364" rx="12" class="fp sl" stroke-width="1.5"/>
+  <rect x="30" y="92" width="580" height="264" rx="10" class="fbg sm" stroke-width="1.2"/>
+  <rect x="200" y="204" width="240" height="96" rx="8" class="fp sa" stroke-width="2"/>
+  <g class="fi" font-size="24" text-anchor="middle">
+    <text x="320" y="46">Confirmed to bind MHC</text>
+    <text x="320" y="130">Tested in a T-cell assay</text>
+    <text x="320" y="246">Tumour-derived</text>
+    <text x="320" y="274">neoantigens</text>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="320" y="74">nothing that was never displayed</text>
+    <text x="320" y="158">mostly viruses and other pathogens</text>
+    <text x="320" y="186">the model trains on the broad set</text>
+    <text x="320" y="330">held out, untouched until the end</text>
+  </g>
+</svg>

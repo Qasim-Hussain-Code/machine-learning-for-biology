@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" class="figsvg">
+  <!-- Figure 3.1: the same Campylobacter jejuni genome counted three times, on a 0 to 1,731 gene axis
+       (480 units for 1,731 genes). The open part of each later bar is what had been withdrawn from the first count. -->
+  <g font-size="22" class="fi">
+    <text x="0" y="24">Microarray spots, one per gene in the first list</text>
+    <text x="0" y="112">Genes in the genome paper, 2000</text>
+    <text x="0" y="200">Genes after the same genome was read again, 2007</text>
+  </g>
+  <g class="fa">
+    <rect x="0" y="36" width="480" height="34"/>
+    <rect x="0" y="124" width="458.65" height="34"/>
+    <rect x="0" y="212" width="455.6" height="34"/>
+  </g>
+  <g class="fn sm" stroke-width="1.5" stroke-dasharray="4 3">
+    <rect x="459.4" y="124.75" width="19.85" height="32.5"/>
+    <rect x="456.35" y="212.75" width="22.9" height="32.5"/>
+  </g>
+  <g class="fbg" font-size="24" text-anchor="end">
+    <text x="468" y="61" class="num">1,731</text>
+    <text x="446" y="149" class="num">1,654</text>
+    <text x="443" y="237" class="num">1,643</text>
+  </g>
+  <g class="fm" font-size="22">
+    <text x="492" y="149"><tspan class="num fi" font-size="24">77</tspan> fewer</text>
+    <text x="492" y="237"><tspan class="num fi" font-size="24">88</tspan> fewer</text>
+  </g>
+  <g class="sm" stroke-width="1.2">
+    <line x1="0" y1="272" x2="480" y2="272"/>
+    <line x1="0" y1="272" x2="0" y2="281"/><line x1="138.65" y1="272" x2="138.65" y2="281"/>
+    <line x1="277.3" y1="272" x2="277.3" y2="281"/><line x1="415.94" y1="272" x2="415.94" y2="281"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="7" y="306" class="num">0</text><text x="138.65" y="306" class="num">500</text>
+    <text x="277.3" y="306" class="num">1,000</text><text x="415.94" y="306" class="num">1,500</text>
+  </g>
+  <text x="0" y="342" font-size="22" class="fm">Genes counted in the same <tspan class="num fi">1,641,481</tspan> letters</text>
+</svg>

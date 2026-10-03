@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 416" class="figsvg">
+  <!-- Figure 6.1: the nine peptide positions act together, and the combinations reach a model in one of two ways.
+       The arcs stand for positions acting on one another; they do not name any pair, which the chapter does not. -->
+  <g class="fn sa" stroke-width="1.6">
+    <path d="M 134 121 C 134 -14 568 -14 568 121"/>
+    <path d="M 196 121 C 196 16 506 16 506 121"/>
+    <path d="M 72 121 C 72 40 320 40 320 121"/>
+    <path d="M 258 121 C 258 77 382 77 382 121"/>
+    <path d="M 444 121 C 444 77 568 77 568 121"/>
+  </g>
+  <g class="fp si" stroke-width="1.4">
+    <circle cx="72" cy="140" r="19"/>
+    <circle cx="134" cy="140" r="19"/>
+    <circle cx="196" cy="140" r="19"/>
+    <circle cx="258" cy="140" r="19"/>
+    <circle cx="320" cy="140" r="19"/>
+    <circle cx="382" cy="140" r="19"/>
+    <circle cx="444" cy="140" r="19"/>
+    <circle cx="506" cy="140" r="19"/>
+    <circle cx="568" cy="140" r="19"/>
+  </g>
+  <g class="fi num" font-size="24" text-anchor="middle">
+    <text x="72" y="148">1</text>
+    <text x="134" y="148">2</text>
+    <text x="196" y="148">3</text>
+    <text x="258" y="148">4</text>
+    <text x="320" y="148">5</text>
+    <text x="382" y="148">6</text>
+    <text x="444" y="148">7</text>
+    <text x="506" y="148">8</text>
+    <text x="568" y="148">9</text>
+  </g>
+  <text x="320" y="192" class="fi" font-size="24" text-anchor="middle">Nine peptide positions</text>
+  <text x="320" y="222" class="fm" font-size="22" text-anchor="middle">change one and the meaning of another can change with it</text>
+  <g class="fn sa" stroke-width="1.6">
+    <path d="M 320 238 L 320 252"/>
+    <path d="M 160 252 L 480 252"/>
+    <path d="M 160 252 L 160 258"/>
+    <path d="M 480 252 L 480 258"/>
+  </g>
+  <g class="fa">
+    <polygon points="160,270 153,257 167,257"/>
+    <polygon points="480,270 473,257 487,257"/>
+  </g>
+  <g class="fp sl" stroke-width="1.3">
+    <rect x="10" y="276" width="300" height="126" rx="8"/>
+    <rect x="330" y="276" width="300" height="126" rx="8"/>
+  </g>
+  <g class="fi" font-size="24">
+    <text x="28" y="314">Support vector machine</text>
+    <text x="348" y="314">Neural network</text>
+  </g>
+  <g class="fm" font-size="22">
+    <text x="28" y="346">the combinations are</text>
+    <text x="28" y="372">multiplied in by hand</text>
+    <text x="348" y="346">learns which positions</text>
+    <text x="348" y="372">interact from the data</text>
+  </g>
+</svg>

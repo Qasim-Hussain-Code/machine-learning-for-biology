@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 358" class="figsvg">
+  <g font-size="22" class="fi">
+    <text x="0" y="24">16S sequencing</text>
+    <text x="340" y="24">Shotgun metagenomics</text>
+  </g>
+
+  <g class="fl sm" stroke-width="1.5">
+    <circle cx="22" cy="63" r="11"/><circle cx="59" cy="63" r="11"/><circle cx="96" cy="63" r="11"/><circle cx="133" cy="63" r="11"/><circle cx="170" cy="63" r="11"/>
+    <circle cx="22" cy="100" r="11"/><circle cx="59" cy="100" r="11"/><circle cx="96" cy="100" r="11"/><circle cx="170" cy="100" r="11"/>
+    <circle cx="22" cy="137" r="11"/><circle cx="59" cy="137" r="11"/><circle cx="96" cy="137" r="11"/><circle cx="133" cy="137" r="11"/><circle cx="170" cy="137" r="11"/>
+    <circle cx="22" cy="174" r="11"/><circle cx="59" cy="174" r="11"/><circle cx="96" cy="174" r="11"/><circle cx="133" cy="174" r="11"/><circle cx="170" cy="174" r="11"/>
+    <circle cx="22" cy="211" r="11"/><circle cx="59" cy="211" r="11"/><circle cx="96" cy="211" r="11"/><circle cx="133" cy="211" r="11"/><circle cx="170" cy="211" r="11"/>
+
+    <circle cx="362" cy="63" r="11"/><circle cx="399" cy="63" r="11"/><circle cx="436" cy="63" r="11"/><circle cx="473" cy="63" r="11"/><circle cx="510" cy="63" r="11"/>
+    <circle cx="362" cy="100" r="11"/><circle cx="399" cy="100" r="11"/><circle cx="436" cy="100" r="11"/><circle cx="510" cy="100" r="11"/>
+    <circle cx="362" cy="137" r="11"/><circle cx="399" cy="137" r="11"/><circle cx="436" cy="137" r="11"/><circle cx="473" cy="137" r="11"/><circle cx="510" cy="137" r="11"/>
+    <circle cx="362" cy="174" r="11"/><circle cx="399" cy="174" r="11"/><circle cx="436" cy="174" r="11"/><circle cx="473" cy="174" r="11"/><circle cx="510" cy="174" r="11"/>
+    <circle cx="362" cy="211" r="11"/><circle cx="399" cy="211" r="11"/><circle cx="436" cy="211" r="11"/><circle cx="473" cy="211" r="11"/><circle cx="510" cy="211" r="11"/>
+  </g>
+  <g class="fa">
+    <circle cx="133" cy="100" r="11"/>
+    <circle cx="473" cy="100" r="11"/>
+  </g>
+
+  <g class="fn si" stroke-width="2">
+    <rect x="1" y="42" width="190" height="190" rx="14"/>
+    <circle cx="473" cy="100" r="18"/>
+  </g>
+
+  <g font-size="22" class="fi">
+    <text x="0" y="268">all <tspan class="num" font-size="24">25</tspan> counted as <tspan font-style="italic">Escherichia</tspan></text>
+    <text x="340" y="268"><tspan font-style="italic">cutC</tspan> counted in <tspan class="num" font-size="24">1</tspan> of <tspan class="num" font-size="24">25</tspan></text>
+  </g>
+
+  <circle cx="11" cy="308" r="11" class="fa"/>
+  <circle cx="11" cy="342" r="11" class="fl sm" stroke-width="1.5"/>
+  <g font-size="22" class="fm">
+    <text x="32" y="315"><tspan class="num fi" font-size="24">4%</tspan> of <tspan font-style="italic">Escherichia coli</tspan> genomes carry a <tspan font-style="italic">cutC</tspan> homologue</text>
+    <text x="32" y="349"><tspan class="num fi" font-size="24">96%</tspan> do not</text>
+  </g>
+</svg>

@@ -1,0 +1,143 @@
+{
+ "prologue": {
+  "days": [
+   1,
+   1
+  ],
+  "figures": [],
+  "words": 350
+ },
+ "ch1": {
+  "days": [
+   2,
+   11
+  ],
+  "figures": [
+   "day-03.jpeg",
+   "day-04.jpeg",
+   "day-05.jpeg",
+   "day-07.jpeg",
+   "day-08.jpeg",
+   "day-09.jpeg",
+   "day-10.jpeg",
+   "day-11.jpeg"
+  ],
+  "words": 4154
+ },
+ "ch2": {
+  "days": [
+   12,
+   25
+  ],
+  "figures": [
+   "day-12.jpeg",
+   "day-13.jpeg",
+   "day-14.jpeg",
+   "day-15.jpeg",
+   "day-16.jpeg",
+   "day-17.jpeg",
+   "day-20.jpeg",
+   "day-22.jpeg",
+   "day-23.jpeg",
+   "day-24.jpeg"
+  ],
+  "words": 4965
+ },
+ "ch3": {
+  "days": [
+   26,
+   39
+  ],
+  "figures": [
+   "day-27.png",
+   "day-30.jpeg",
+   "day-33.jpeg",
+   "day-34.jpeg",
+   "day-36.jpeg",
+   "day-37.jpeg"
+  ],
+  "words": 4396
+ },
+ "ch4": {
+  "days": [
+   40,
+   45
+  ],
+  "figures": [
+   "day-43.jpeg",
+   "day-44.jpeg"
+  ],
+  "words": 2125
+ },
+ "interlude-46": {
+  "days": [
+   46,
+   46
+  ],
+  "figures": [],
+  "words": 246
+ },
+ "ch5": {
+  "days": [
+   47,
+   53
+  ],
+  "figures": [
+   "day-48.jpeg",
+   "day-49.jpeg",
+   "day-51.jpeg",
+   "day-52.jpeg"
+  ],
+  "words": 2361
+ },
+ "interlude-54": {
+  "days": [
+   54,
+   54
+  ],
+  "figures": [],
+  "words": 242
+ },
+ "ch6": {
+  "days": [
+   55,
+   60
+  ],
+  "figures": [
+   "day-56.jpeg",
+   "day-58.jpeg",
+   "day-59.jpeg"
+  ],
+  "words": 1622
+ },
+ "interlude-61": {
+  "days": [
+   61,
+   61
+  ],
+  "figures": [],
+  "words": 284
+ },
+ "ch7": {
+  "days": [
+   62,
+   69
+  ],
+  "figures": [
+   "day-62.jpeg",
+   "day-64.jpeg",
+   "day-65.jpeg",
+   "day-66.jpeg",
+   "day-69.jpeg"
+  ],
+  "words": 2940
+ },
+ "epilogue": {
+  "days": [
+   70,
+   70
+  ],
+  "figures": [],
+  "words": 247
+ }
+}

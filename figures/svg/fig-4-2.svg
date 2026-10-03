@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 392" class="figsvg">
+  <g class="sl" stroke-width="1.2">
+    <line x1="0" y1="98" x2="640" y2="98"/>
+    <line x1="0" y1="196" x2="640" y2="196"/>
+    <line x1="0" y1="294" x2="640" y2="294"/>
+  </g>
+  <g font-size="34" class="fa num">
+    <text x="4" y="58">1</text>
+    <text x="4" y="156">2</text>
+    <text x="4" y="254">3</text>
+    <text x="4" y="352">4</text>
+  </g>
+  <g font-size="23" class="fi">
+    <text x="50" y="40">The cohort is not a random sample of cancer patients</text>
+    <text x="50" y="138">One clinical fact may count as several features</text>
+    <text x="50" y="236">Events, not patients, limit a survival model</text>
+    <text x="50" y="334">Closer follow-up, not the tumour, may predict outcome</text>
+  </g>
+  <g font-size="22" class="fm">
+    <text x="50" y="74"><tspan class="fa">Check:</tspan> none possible from within the cohort</text>
+    <text x="50" y="172"><tspan class="fa">Check:</tspan> rank correlation among stage, pT, pN and others</text>
+    <text x="50" y="270"><tspan class="fa">Check:</tspan> below <tspan class="num" font-size="24">50</tspan> events, a result carries a warning</text>
+    <text x="50" y="368"><tspan class="fa">Check:</tspan> early follow-up contacts against later events</text>
+  </g>
+</svg>

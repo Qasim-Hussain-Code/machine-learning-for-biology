@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 322" class="figsvg">
+  <!-- Figure 7.2: one round of k-means on a sketch, not the chapter's data. Every point joins its true nearest marker,
+       each marker moves to the exact mean of its points, and a second round would change nothing. -->
+  <text x="433" y="22" font-size="22" class="fm" text-anchor="middle">Repeat until nothing moves</text>
+  <path d="M 546 64 V 38 H 320 V 52" class="fn sm" stroke-width="1.6"/>
+  <polygon points="320,63 314,51 326,51" class="fm"/>
+
+  <g class="fp">
+    <rect x="0" y="64" width="188" height="188" rx="8"/>
+    <rect x="226" y="64" width="188" height="188" rx="8"/>
+    <rect x="452" y="64" width="188" height="188" rx="8"/>
+  </g>
+  <g class="sm" stroke-width="1.6">
+    <line x1="194" y1="158" x2="210" y2="158"/>
+    <line x1="420" y1="158" x2="436" y2="158"/>
+  </g>
+  <g class="fm">
+    <polygon points="221,158 209,152 209,164"/>
+    <polygon points="447,158 435,152 435,164"/>
+  </g>
+
+  <!-- 1: cells not yet in any group, markers dropped -->
+  <g transform="translate(0 64)">
+    <g class="fn sm" stroke-width="1.6">
+      <circle cx="66.6" cy="40.1" r="5.5"/><circle cx="53.0" cy="88.0" r="5.5"/><circle cx="28.1" cy="66.5" r="5.5"/><circle cx="74.6" cy="61.7" r="5.5"/>
+      <circle cx="49.3" cy="31.7" r="5.5"/><circle cx="25.3" cy="47.4" r="5.5"/><circle cx="39.5" cy="79.0" r="5.5"/><circle cx="64.0" cy="76.1" r="5.5"/>
+      <circle cx="143.2" cy="94.4" r="5.5"/><circle cx="111.8" cy="46.4" r="5.5"/><circle cx="115.3" cy="86.6" r="5.5"/><circle cx="160.0" cy="43.4" r="5.5"/>
+      <circle cx="156.5" cy="69.2" r="5.5"/><circle cx="105.7" cy="72.2" r="5.5"/><circle cx="141.6" cy="40.2" r="5.5"/><circle cx="159.2" cy="85.6" r="5.5"/>
+      <circle cx="70.2" cy="151.5" r="5.5"/><circle cx="87.9" cy="156.6" r="5.5"/><circle cx="93.9" cy="112.0" r="5.5"/><circle cx="120.4" cy="139.5" r="5.5"/>
+      <circle cx="71.4" cy="118.3" r="5.5"/><circle cx="102.2" cy="165.5" r="5.5"/><circle cx="110.8" cy="114.6" r="5.5"/><circle cx="63.5" cy="133.9" r="5.5"/>
+    </g>
+    <g class="si" stroke-width="1.6">
+      <path d="M 24 12 L 36 24 L 24 36 L 12 24 Z" class="fa"/>
+      <path d="M 170 12 L 182 24 L 170 36 L 158 24 Z" class="fa2"/>
+      <path d="M 52 158 L 64 170 L 52 182 L 40 170 Z" class="fi"/>
+    </g>
+  </g>
+
+  <!-- 2: each cell joins its nearest marker -->
+  <g transform="translate(226 64)">
+    <g class="fa">
+      <circle cx="66.6" cy="40.1" r="5.5"/><circle cx="53.0" cy="88.0" r="5.5"/><circle cx="28.1" cy="66.5" r="5.5"/><circle cx="74.6" cy="61.7" r="5.5"/>
+      <circle cx="49.3" cy="31.7" r="5.5"/><circle cx="25.3" cy="47.4" r="5.5"/><circle cx="39.5" cy="79.0" r="5.5"/><circle cx="64.0" cy="76.1" r="5.5"/>
+    </g>
+    <g class="fa2">
+      <circle cx="143.2" cy="94.4" r="5.5"/><circle cx="111.8" cy="46.4" r="5.5"/><circle cx="115.3" cy="86.6" r="5.5"/><circle cx="160.0" cy="43.4" r="5.5"/>
+      <circle cx="156.5" cy="69.2" r="5.5"/><circle cx="105.7" cy="72.2" r="5.5"/><circle cx="141.6" cy="40.2" r="5.5"/><circle cx="159.2" cy="85.6" r="5.5"/>
+    </g>
+    <g class="fi">
+      <circle cx="70.2" cy="151.5" r="5.5"/><circle cx="87.9" cy="156.6" r="5.5"/><circle cx="93.9" cy="112.0" r="5.5"/><circle cx="120.4" cy="139.5" r="5.5"/>
+      <circle cx="71.4" cy="118.3" r="5.5"/><circle cx="102.2" cy="165.5" r="5.5"/><circle cx="110.8" cy="114.6" r="5.5"/><circle cx="63.5" cy="133.9" r="5.5"/>
+    </g>
+    <g class="si" stroke-width="1.6">
+      <path d="M 24 12 L 36 24 L 24 36 L 12 24 Z" class="fa"/>
+      <path d="M 170 12 L 182 24 L 170 36 L 158 24 Z" class="fa2"/>
+      <path d="M 52 158 L 64 170 L 52 182 L 40 170 Z" class="fi"/>
+    </g>
+  </g>
+
+  <!-- 3: each marker moves to the mean of its cells (50.0, 61.3), (136.7, 67.2), (90.0, 136.5) -->
+  <g transform="translate(452 64)">
+    <g class="fa">
+      <circle cx="66.6" cy="40.1" r="5.5"/><circle cx="53.0" cy="88.0" r="5.5"/><circle cx="28.1" cy="66.5" r="5.5"/><circle cx="74.6" cy="61.7" r="5.5"/>
+      <circle cx="49.3" cy="31.7" r="5.5"/><circle cx="25.3" cy="47.4" r="5.5"/><circle cx="39.5" cy="79.0" r="5.5"/><circle cx="64.0" cy="76.1" r="5.5"/>
+    </g>
+    <g class="fa2">
+      <circle cx="143.2" cy="94.4" r="5.5"/><circle cx="111.8" cy="46.4" r="5.5"/><circle cx="115.3" cy="86.6" r="5.5"/><circle cx="160.0" cy="43.4" r="5.5"/>
+      <circle cx="156.5" cy="69.2" r="5.5"/><circle cx="105.7" cy="72.2" r="5.5"/><circle cx="141.6" cy="40.2" r="5.5"/><circle cx="159.2" cy="85.6" r="5.5"/>
+    </g>
+    <g class="fi">
+      <circle cx="70.2" cy="151.5" r="5.5"/><circle cx="87.9" cy="156.6" r="5.5"/><circle cx="93.9" cy="112.0" r="5.5"/><circle cx="120.4" cy="139.5" r="5.5"/>
+      <circle cx="71.4" cy="118.3" r="5.5"/><circle cx="102.2" cy="165.5" r="5.5"/><circle cx="110.8" cy="114.6" r="5.5"/><circle cx="63.5" cy="133.9" r="5.5"/>
+    </g>
+    <g class="fn" stroke-width="1.4" stroke-dasharray="3 3">
+      <path d="M 24 12 L 36 24 L 24 36 L 12 24 Z" class="sa"/>
+      <path d="M 170 12 L 182 24 L 170 36 L 158 24 Z" class="sa2"/>
+      <path d="M 52 158 L 64 170 L 52 182 L 40 170 Z" class="si"/>
+    </g>
+    <g class="si" stroke-width="1.6">
+      <path d="M 50.0 49.3 L 62.0 61.3 L 50.0 73.3 L 38.0 61.3 Z" class="fa"/>
+      <path d="M 136.7 55.2 L 148.7 67.2 L 136.7 79.2 L 124.7 67.2 Z" class="fa2"/>
+      <path d="M 90.0 124.5 L 102.0 136.5 L 90.0 148.5 L 78.0 136.5 Z" class="fi"/>
+    </g>
+  </g>
+
+  <g font-size="22" class="fi" text-anchor="middle">
+    <text x="94" y="286">Drop k markers</text>
+    <text x="94" y="312">into the space</text>
+    <text x="320" y="286">Each cell joins</text>
+    <text x="320" y="312">its nearest marker</text>
+    <text x="546" y="286">Each marker moves</text>
+    <text x="546" y="312">to the middle</text>
+  </g>
+</svg>

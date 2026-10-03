@@ -1,0 +1,989 @@
+<!doctype html><html lang="en-GB" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>What does a cell show to the immune system? · Machine Learning for Biology</title>
+<meta name="description" content="Machine Learning for Biology, a book by Qasim Hussain.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/book.css">
+<script>(function(){var r=document.documentElement;try{var s=localStorage.getItem('mlb-theme');if(s)r.dataset.theme=s;}catch(e){}})();</script>
+</head><body class="lay-sidebar hs-smallcaps justify">
+<a class="skip" href="#main">Skip to the text</a>
+<header class="topbar"><a class="tb-title" href="index.html">Machine Learning for Biology</a>
+<div class="tb-right"><a class="tb-ed" href="machine-learning-for-biology.pdf" aria-label="Download the print edition, PDF (2 MB)" title="Download the print edition, PDF (2 MB)">PDF</a><a class="tb-ed" href="machine-learning-for-biology.epub" download aria-label="Download the e-book edition, EPUB (0 MB)" title="Download the e-book edition, EPUB (0 MB)">EPUB</a><button class="modebtn" type="button" aria-label="Switch to light mode">Light<span class="wide"> mode</span></button></div></header>
+<div class="frame"><nav class="toc" aria-label="Contents"><details class="tocd" open><summary class="toch">Contents</summary><ol><li><a href="preface.html">Preface</a></li><li><a href="prologue.html">Prologue</a></li><li class="part">Part I · Learning from labels</li><li><a href="chapter-1.html"><span class="n">1</span> Predicting antibiotic resistance from a genome<span class="m">Logistic regression</span></a></li><li class="on"><a href="chapter-2.html" aria-current="page"><span class="n">2</span> What does a cell show to the immune system?<span class="m">Decision tree</span></a><ol class="secs"><li><a href="#why-a-tree"><span class="sn">2.1</span>Why a tree</a></li><li><a href="#nine-letters-as-a-table"><span class="sn">2.2</span>Nine letters as a table</a></li><li><a href="#how-a-tree-chooses-and-what-stops-it"><span class="sn">2.3</span>How a tree chooses, and what stops it</a></li><li><a href="#the-rules"><span class="sn">2.4</span>The rules</a></li><li><a href="#where-this-could-go-wrong"><span class="sn">2.5</span>Where this could go wrong</a></li><li><a href="#a-column-with-no-unit"><span class="sn">2.6</span>A column with no unit</a></li><li><a href="#what-the-tree-found"><span class="sn">2.7</span>What the tree found</a></li><li><a href="#what-a-score-is-worth"><span class="sn">2.8</span>What a score is worth</a></li><li><a href="#why-the-smallest-encoding-won"><span class="sn">2.9</span>Why the smallest encoding won</a></li><li><a href="#the-depth-i-reported"><span class="sn">2.10</span>The depth I reported</a></li><li><a href="#which-mistakes-it-makes"><span class="sn">2.11</span>Which mistakes it makes</a></li><li><a href="#peptides-that-disagree-with-themselves"><span class="sn">2.12</span>Peptides that disagree with themselves</a></li><li><a href="#the-allele-filter"><span class="sn">2.13</span>The allele filter</a></li></ol></li><li><a href="chapter-3.html"><span class="n">3</span> Is a gene a fact or a call?<span class="m">Random forest</span></a></li><li><a href="chapter-4.html"><span class="n">4</span> What happens to the patients who are still alive?<span class="m">Gradient boosting</span></a></li><li><a href="chapter-5.html"><span class="n">5</span> Gut bacteria and cardiovascular risk<span class="m">Logistic regression (support vector machine planned)</span></a></li><li><a href="chapter-6.html"><span class="n">6</span> Neoantigen immunogenicity for cancer vaccine design<span class="m">Neural network</span></a></li><li class="part">Part II · Learning without labels</li><li><a href="chapter-7.html"><span class="n">7</span> Immune cell subtype discovery from single-cell RNA-seq<span class="m">k-means</span></a></li><li><a href="epilogue.html">Epilogue</a></li></ol><p class="tohome"><a href="index.html">Title page and contents</a></p></details></nav><main class="col" id="main"><header class="opener op-smallcaps"><p class="op-kicker">Chapter 2 · Part I · Learning from labels</p>
+<h1 class="op-title">What does a cell show to the immune system?</h1><p class="op-model">Model: Decision tree</p>
+<p class="op-question">If the groove grips only two positions out of nine, why is one rule about position two not enough?</p></header><section class="summary"><p class="sk">Summary</p><p>One MHC molecule, <span class="nw">HLA-A*02:01</span>, and 11,723 laboratory measurements of nine-amino-acid peptides, of which 4,958 bound below 500 nanomolar. A decision tree given 27 columns of hydrophobicity, molecular weight and charge reached F1 0.7399 on proteins it had never seen, against 0.7153 for the same tree on 180 one-hot columns and 0.6667 for the textbook rule of leucine or methionine at position two. The tree recovered the two anchor positions published in 1991 without being told they existed. The chapter ends on an allele filter that matched a substring and let in 302 measurements from macaque, horse, cattle, chicken and eleven engineered point mutants of the human molecule.</p></section><div class="bodywrap"><p>There is a reason Chapter 1 stopped at logistic regression.</p>
+<p>It was already enough. Eighty-four features did no better than one, and adding a more powerful model to a solved
+problem teaches nothing. So this chapter keeps the task, predicting a category, and changes the problem underneath
+it. The data is harder, and this time the differences between the models are real. Four models, one to a chapter:
+decision trees and the rules they learn, random forests and what is lost when a model can no longer be read,
+gradient boosting and a label that is two numbers together, and support vector machines and the geometry of a
+decision boundary (Figure 2.1). This chapter is the decision tree.</p>
+<p>Right now, every cell in your body is holding up samples of what is inside it. Proteins get chopped into short
+fragments. Some of those fragments are carried to the cell surface and held there, where passing immune cells inspect
+them. If a fragment looks foreign, the cell is killed. That is how your immune system finds a virus hiding inside a
+cell without ever going in. It reads the samples on the outside.</p>
+<p>The molecule doing the holding is called Major Histocompatibility Complex class I, or MHC class I. It has a groove. A
+fragment nine amino acids long sits in that groove like a key in a lock. Two of those nine do most of the gripping, the
+second and the ninth. Get both right and the fragment is displayed. Get one wrong and it falls out, the immune system
+never sees it, and a virus with the wrong fragments is invisible.</p>
+<p>So here is the chapter. Give the model nine amino acids. Ask whether they bind.</p>
+<p>One MHC molecule, <span class="nw">HLA-A*02:01</span>, the most studied variant in the world. The first download gave 15,597 laboratory
+measurements and 9,142 distinct fragments, and 53.7% of those measurements were binders, which is almost exactly a coin
+flip. In Chapter 1, guessing susceptible every time was right 79.32% of the time before I read a single base of DNA.
+This time, guessing gets me nothing. Those counts are the download as it arrived, before I checked which unit each
+measurement was in, and the corrected cohort, smaller and with a lower share of binders, comes later in this chapter.</p>
+<aside class="note">
+<p><strong>Nanomolar.</strong> The unit binding affinity is measured in. A smaller number means a
+tighter grip, so a measurement below 500 nanomolar counts as a binder.</p>
+</aside>
+<p>One more thing, and it should feel familiar from Chapter 1. Binding strength is a number. Somebody drew a line across
+it and called everything on one side a binder. The database that supplies this data says, in its own documentation,
+that the line should probably sit somewhere different for every MHC molecule.</p>
+<figure class="fig" id="fig-2-1"><svg role="img" aria-label="Four stacked panels, one for each model: decision trees, random forests, gradient boosting and support vector machines, each with a line saying what it is there to show. The decision tree panel is marked as this chapter." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 410" class="figsvg">
+  <g>
+    <rect x="0" y="0" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="0" width="7" height="92" class="fa"/>
+    <text x="26" y="38" font-size="27" class="fi">Decision trees</text>
+    <text x="632" y="38" font-size="22" text-anchor="end" class="fa">This chapter</text>
+    <text x="26" y="70" font-size="23" class="fm">the rules they learn</text>
+  </g>
+  <g>
+    <rect x="0" y="106" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="106" width="7" height="92" class="fl"/>
+    <text x="26" y="144" font-size="27" class="fi">Random forests</text>
+    <text x="26" y="176" font-size="23" class="fm">what is lost when a model can no longer be read</text>
+  </g>
+  <g>
+    <rect x="0" y="212" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="212" width="7" height="92" class="fl"/>
+    <text x="26" y="250" font-size="27" class="fi">Gradient boosting</text>
+    <text x="26" y="282" font-size="23" class="fm">a label that is two numbers together</text>
+  </g>
+  <g>
+    <rect x="0" y="318" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="318" width="7" height="92" class="fl"/>
+    <text x="26" y="356" font-size="27" class="fi">Support vector machines</text>
+    <text x="26" y="388" font-size="23" class="fm">the geometry of a decision boundary</text>
+  </g>
+</svg>
+<figcaption><b>Figure 2.1</b> The four models the chapters take in turn, one to a chapter, each with what it is there to show. This chapter is the first of them, the decision tree.</figcaption></figure>
+
+<h2 id="why-a-tree"><span class="secno">2.1</span> Why a tree</h2>
+<p>Now look at the shape of the groove&rsquo;s rule.</p>
+<p>Chapter 1 was one position. One change at <em>gyrA</em> 86, and ciprofloxacin stops working. One question, one answer.</p>
+<p>This needs two positions to agree at once. And what counts as agreeable at position nine depends on which MHC molecule
+you have, and people carry different ones. That is a conjunction, not a threshold.</p>
+<p>Which is exactly what a decision tree is made of. It asks one question, then asks a different question depending on the
+answer, then another. Follow the path and you have a chain of conditions. The groove enforces a chain of conditions.
+The tree is built from them (Figure 2.2).</p>
+<figure class="fig" id="fig-2-2"><svg role="img" aria-label="A row of nine numbered boxes in a groove, with the second and the ninth filled in. Below it, a chain of two questions: does position two fit, then does position nine fit. A no at either question leads to a box saying the fragment falls out and the immune system never sees it, and a yes at both leads to a box saying displayed." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 426" class="figsvg">
+  <rect x="0" y="0" width="640" height="66" rx="10" class="fp"/>
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="8" y="4" width="58" height="58" rx="6"/>
+    <rect x="148" y="4" width="58" height="58" rx="6"/>
+    <rect x="218" y="4" width="58" height="58" rx="6"/>
+    <rect x="288" y="4" width="58" height="58" rx="6"/>
+    <rect x="358" y="4" width="58" height="58" rx="6"/>
+    <rect x="428" y="4" width="58" height="58" rx="6"/>
+    <rect x="498" y="4" width="58" height="58" rx="6"/>
+  </g>
+  <g class="fa">
+    <rect x="78" y="4" width="58" height="58" rx="6"/>
+    <rect x="568" y="4" width="58" height="58" rx="6"/>
+  </g>
+  <g class="fi num" font-size="26" text-anchor="middle">
+    <text x="37" y="42">1</text>
+    <text x="177" y="42">3</text>
+    <text x="247" y="42">4</text>
+    <text x="317" y="42">5</text>
+    <text x="387" y="42">6</text>
+    <text x="457" y="42">7</text>
+    <text x="527" y="42">8</text>
+  </g>
+  <g class="fbg num" font-size="26" text-anchor="middle">
+    <text x="107" y="42">2</text>
+    <text x="597" y="42">9</text>
+  </g>
+  <text x="320" y="96" font-size="22" text-anchor="middle" class="fm">The second and the ninth do most of the gripping</text>
+
+  <rect x="0" y="124" width="330" height="62" rx="8" class="fp"/>
+  <text x="165" y="163" font-size="24" text-anchor="middle" class="fi">Does position two fit?</text>
+  <rect x="0" y="240" width="330" height="62" rx="8" class="fp"/>
+  <text x="165" y="279" font-size="24" text-anchor="middle" class="fi">Does position nine fit?</text>
+  <rect x="0" y="356" width="330" height="62" rx="8" class="fa"/>
+  <text x="165" y="395" font-size="26" text-anchor="middle" class="fbg">Displayed</text>
+
+  <g class="sm" stroke-width="2">
+    <line x1="330" y1="155" x2="390" y2="155"/>
+    <line x1="330" y1="271" x2="390" y2="271"/>
+    <line x1="165" y1="186" x2="165" y2="226"/>
+    <line x1="165" y1="302" x2="165" y2="342"/>
+  </g>
+  <g class="fm">
+    <polygon points="390,148 404,155 390,162"/>
+    <polygon points="390,264 404,271 390,278"/>
+    <polygon points="158,226 165,240 172,226"/>
+    <polygon points="158,342 165,356 172,342"/>
+  </g>
+  <g class="fm" font-size="22">
+    <text x="360" y="144" text-anchor="middle">no</text>
+    <text x="360" y="260" text-anchor="middle">no</text>
+    <text x="178" y="214">yes</text>
+    <text x="178" y="330">yes</text>
+  </g>
+
+  <rect x="404" y="124" width="236" height="178" rx="8" class="fn sm" stroke-width="1.5"/>
+  <g class="fi" font-size="23" text-anchor="middle">
+    <text x="522" y="188">Falls out, and</text>
+    <text x="522" y="220">the immune system</text>
+    <text x="522" y="252">never sees it</text>
+  </g>
+</svg>
+<figcaption><b>Figure 2.2</b> The groove holds nine positions and grips at two of them, the second and the ninth. Both have to fit, so the rule is a chain of two questions, which is what a decision tree is made of.</figcaption></figure>
+
+<h2 id="nine-letters-as-a-table"><span class="secno">2.2</span> Nine letters as a table</h2>
+<p>GILGFVFTL. Nine letters, positions 58 to 66 of the influenza A matrix protein. If you carry <span class="nw">HLA-A*02:01</span>, your cells
+display this fragment when you have flu, and it is the most studied T-cell target we have. Position two is isoleucine
+and position nine is leucine. Both sit in their pockets.</p>
+<p>Now hand those nine letters to a model. It sees nine characters. No chemistry, no shape, no charge. Only characters.</p>
+<p>Machine learning models take numbers, and a peptide sequence is text. Something has to convert one into the other, and
+that something is a choice.</p>
+<p>The obvious choice is to number the alphabet. Alanine becomes 1, cysteine 2, and so on to tyrosine at 20. Nine columns.
+Done.</p>
+<p>It is also wrong. A decision tree splits by asking whether a number falls below some value. Ask whether the amino acid
+is below ten and you have grouped alanine, aspartate, phenylalanine and lysine. They share nothing except the alphabet.</p>
+<p>The honest version is called one-hot encoding, one column for every amino acid at every position. Nine positions and
+twenty amino acids give 180 columns, each holding a zero or a one. Every column is one yes-or-no question. Is position
+two a leucine. Is position three a valine. That is the question the groove asks.</p>
+<p>The cost is that similarity disappears. Leucine and isoleucine are the same atoms arranged differently. Across 180
+columns they are strangers, and the model has to learn each one alone.</p>
+<p>The third option is to describe each amino acid instead of naming it. Hydrophobicity, molecular weight and charge become
+the columns, three numbers for every position and twenty-seven in all. Molecular weight stands in for the size of the
+residue, and similar residues then get similar numbers. That is fewer columns and more biology, but it is a bet placed
+before the model has seen anything.</p>
+<p>All three go in the repository (Figure 2.3), and I said I would write down which one I expected to win before any of
+them had a score, because a choice made after seeing the scores is not really a choice. I never wrote it. The pipeline
+did not run for several days, and when it did, there was nothing on record saying which encoding I had backed.
+Listing 2.1 shows the three encodings.</p>
+<figure class="fig" id="fig-2-3"><svg role="img" aria-label="The peptide GILGFVFTL as nine letters, then as nine numbers, one for each amino acid's place in the alphabet of twenty, then as nine columns of twenty cells with one cell filled in each column, then as nine groups of three filled cells." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 468" class="figsvg">
+  <g class="fp">
+    <rect x="0" y="4" width="64" height="48" rx="6"/>
+    <rect x="72" y="4" width="64" height="48" rx="6"/>
+    <rect x="144" y="4" width="64" height="48" rx="6"/>
+    <rect x="216" y="4" width="64" height="48" rx="6"/>
+    <rect x="288" y="4" width="64" height="48" rx="6"/>
+    <rect x="360" y="4" width="64" height="48" rx="6"/>
+    <rect x="432" y="4" width="64" height="48" rx="6"/>
+    <rect x="504" y="4" width="64" height="48" rx="6"/>
+    <rect x="576" y="4" width="64" height="48" rx="6"/>
+  </g>
+  <g class="fi" font-size="28" text-anchor="middle">
+    <text x="32" y="39">G</text>
+    <text x="104" y="39">I</text>
+    <text x="176" y="39">L</text>
+    <text x="248" y="39">G</text>
+    <text x="320" y="39">F</text>
+    <text x="392" y="39">V</text>
+    <text x="464" y="39">F</text>
+    <text x="536" y="39">T</text>
+    <text x="608" y="39">L</text>
+  </g>
+
+  <text x="0" y="96" font-size="23" class="fi">Alphabet numbering</text>
+  <text x="640" y="96" font-size="24" text-anchor="end" class="fi"><tspan class="num">9</tspan> columns</text>
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="0" y="108" width="64" height="44" rx="6"/>
+    <rect x="72" y="108" width="64" height="44" rx="6"/>
+    <rect x="144" y="108" width="64" height="44" rx="6"/>
+    <rect x="216" y="108" width="64" height="44" rx="6"/>
+    <rect x="288" y="108" width="64" height="44" rx="6"/>
+    <rect x="360" y="108" width="64" height="44" rx="6"/>
+    <rect x="432" y="108" width="64" height="44" rx="6"/>
+    <rect x="504" y="108" width="64" height="44" rx="6"/>
+    <rect x="576" y="108" width="64" height="44" rx="6"/>
+  </g>
+  <g class="fi num" font-size="26" text-anchor="middle">
+    <text x="32" y="139">6</text>
+    <text x="104" y="139">8</text>
+    <text x="176" y="139">10</text>
+    <text x="248" y="139">6</text>
+    <text x="320" y="139">5</text>
+    <text x="392" y="139">18</text>
+    <text x="464" y="139">5</text>
+    <text x="536" y="139">17</text>
+    <text x="608" y="139">10</text>
+  </g>
+
+  <text x="0" y="196" font-size="23" class="fi">One-hot</text>
+  <text x="640" y="196" font-size="24" text-anchor="end" class="fi"><tspan class="num">180</tspan> columns</text>
+  <g class="fl">
+    <rect x="0" y="208" width="64" height="7"/>
+    <rect x="0" y="216" width="64" height="7"/>
+    <rect x="0" y="224" width="64" height="7"/>
+    <rect x="0" y="232" width="64" height="7"/>
+    <rect x="0" y="240" width="64" height="7"/>
+    <rect x="0" y="256" width="64" height="7"/>
+    <rect x="0" y="264" width="64" height="7"/>
+    <rect x="0" y="272" width="64" height="7"/>
+    <rect x="0" y="280" width="64" height="7"/>
+    <rect x="0" y="288" width="64" height="7"/>
+    <rect x="0" y="296" width="64" height="7"/>
+    <rect x="0" y="304" width="64" height="7"/>
+    <rect x="0" y="312" width="64" height="7"/>
+    <rect x="0" y="320" width="64" height="7"/>
+    <rect x="0" y="328" width="64" height="7"/>
+    <rect x="0" y="336" width="64" height="7"/>
+    <rect x="0" y="344" width="64" height="7"/>
+    <rect x="0" y="352" width="64" height="7"/>
+    <rect x="0" y="360" width="64" height="7"/>
+    <rect x="72" y="208" width="64" height="7"/>
+    <rect x="72" y="216" width="64" height="7"/>
+    <rect x="72" y="224" width="64" height="7"/>
+    <rect x="72" y="232" width="64" height="7"/>
+    <rect x="72" y="240" width="64" height="7"/>
+    <rect x="72" y="248" width="64" height="7"/>
+    <rect x="72" y="256" width="64" height="7"/>
+    <rect x="72" y="272" width="64" height="7"/>
+    <rect x="72" y="280" width="64" height="7"/>
+    <rect x="72" y="288" width="64" height="7"/>
+    <rect x="72" y="296" width="64" height="7"/>
+    <rect x="72" y="304" width="64" height="7"/>
+    <rect x="72" y="312" width="64" height="7"/>
+    <rect x="72" y="320" width="64" height="7"/>
+    <rect x="72" y="328" width="64" height="7"/>
+    <rect x="72" y="336" width="64" height="7"/>
+    <rect x="72" y="344" width="64" height="7"/>
+    <rect x="72" y="352" width="64" height="7"/>
+    <rect x="72" y="360" width="64" height="7"/>
+    <rect x="144" y="208" width="64" height="7"/>
+    <rect x="144" y="216" width="64" height="7"/>
+    <rect x="144" y="224" width="64" height="7"/>
+    <rect x="144" y="232" width="64" height="7"/>
+    <rect x="144" y="240" width="64" height="7"/>
+    <rect x="144" y="248" width="64" height="7"/>
+    <rect x="144" y="256" width="64" height="7"/>
+    <rect x="144" y="264" width="64" height="7"/>
+    <rect x="144" y="272" width="64" height="7"/>
+    <rect x="144" y="288" width="64" height="7"/>
+    <rect x="144" y="296" width="64" height="7"/>
+    <rect x="144" y="304" width="64" height="7"/>
+    <rect x="144" y="312" width="64" height="7"/>
+    <rect x="144" y="320" width="64" height="7"/>
+    <rect x="144" y="328" width="64" height="7"/>
+    <rect x="144" y="336" width="64" height="7"/>
+    <rect x="144" y="344" width="64" height="7"/>
+    <rect x="144" y="352" width="64" height="7"/>
+    <rect x="144" y="360" width="64" height="7"/>
+    <rect x="216" y="208" width="64" height="7"/>
+    <rect x="216" y="216" width="64" height="7"/>
+    <rect x="216" y="224" width="64" height="7"/>
+    <rect x="216" y="232" width="64" height="7"/>
+    <rect x="216" y="240" width="64" height="7"/>
+    <rect x="216" y="256" width="64" height="7"/>
+    <rect x="216" y="264" width="64" height="7"/>
+    <rect x="216" y="272" width="64" height="7"/>
+    <rect x="216" y="280" width="64" height="7"/>
+    <rect x="216" y="288" width="64" height="7"/>
+    <rect x="216" y="296" width="64" height="7"/>
+    <rect x="216" y="304" width="64" height="7"/>
+    <rect x="216" y="312" width="64" height="7"/>
+    <rect x="216" y="320" width="64" height="7"/>
+    <rect x="216" y="328" width="64" height="7"/>
+    <rect x="216" y="336" width="64" height="7"/>
+    <rect x="216" y="344" width="64" height="7"/>
+    <rect x="216" y="352" width="64" height="7"/>
+    <rect x="216" y="360" width="64" height="7"/>
+    <rect x="288" y="208" width="64" height="7"/>
+    <rect x="288" y="216" width="64" height="7"/>
+    <rect x="288" y="224" width="64" height="7"/>
+    <rect x="288" y="232" width="64" height="7"/>
+    <rect x="288" y="248" width="64" height="7"/>
+    <rect x="288" y="256" width="64" height="7"/>
+    <rect x="288" y="264" width="64" height="7"/>
+    <rect x="288" y="272" width="64" height="7"/>
+    <rect x="288" y="280" width="64" height="7"/>
+    <rect x="288" y="288" width="64" height="7"/>
+    <rect x="288" y="296" width="64" height="7"/>
+    <rect x="288" y="304" width="64" height="7"/>
+    <rect x="288" y="312" width="64" height="7"/>
+    <rect x="288" y="320" width="64" height="7"/>
+    <rect x="288" y="328" width="64" height="7"/>
+    <rect x="288" y="336" width="64" height="7"/>
+    <rect x="288" y="344" width="64" height="7"/>
+    <rect x="288" y="352" width="64" height="7"/>
+    <rect x="288" y="360" width="64" height="7"/>
+    <rect x="360" y="208" width="64" height="7"/>
+    <rect x="360" y="216" width="64" height="7"/>
+    <rect x="360" y="224" width="64" height="7"/>
+    <rect x="360" y="232" width="64" height="7"/>
+    <rect x="360" y="240" width="64" height="7"/>
+    <rect x="360" y="248" width="64" height="7"/>
+    <rect x="360" y="256" width="64" height="7"/>
+    <rect x="360" y="264" width="64" height="7"/>
+    <rect x="360" y="272" width="64" height="7"/>
+    <rect x="360" y="280" width="64" height="7"/>
+    <rect x="360" y="288" width="64" height="7"/>
+    <rect x="360" y="296" width="64" height="7"/>
+    <rect x="360" y="304" width="64" height="7"/>
+    <rect x="360" y="312" width="64" height="7"/>
+    <rect x="360" y="320" width="64" height="7"/>
+    <rect x="360" y="328" width="64" height="7"/>
+    <rect x="360" y="336" width="64" height="7"/>
+    <rect x="360" y="352" width="64" height="7"/>
+    <rect x="360" y="360" width="64" height="7"/>
+    <rect x="432" y="208" width="64" height="7"/>
+    <rect x="432" y="216" width="64" height="7"/>
+    <rect x="432" y="224" width="64" height="7"/>
+    <rect x="432" y="232" width="64" height="7"/>
+    <rect x="432" y="248" width="64" height="7"/>
+    <rect x="432" y="256" width="64" height="7"/>
+    <rect x="432" y="264" width="64" height="7"/>
+    <rect x="432" y="272" width="64" height="7"/>
+    <rect x="432" y="280" width="64" height="7"/>
+    <rect x="432" y="288" width="64" height="7"/>
+    <rect x="432" y="296" width="64" height="7"/>
+    <rect x="432" y="304" width="64" height="7"/>
+    <rect x="432" y="312" width="64" height="7"/>
+    <rect x="432" y="320" width="64" height="7"/>
+    <rect x="432" y="328" width="64" height="7"/>
+    <rect x="432" y="336" width="64" height="7"/>
+    <rect x="432" y="344" width="64" height="7"/>
+    <rect x="432" y="352" width="64" height="7"/>
+    <rect x="432" y="360" width="64" height="7"/>
+    <rect x="504" y="208" width="64" height="7"/>
+    <rect x="504" y="216" width="64" height="7"/>
+    <rect x="504" y="224" width="64" height="7"/>
+    <rect x="504" y="232" width="64" height="7"/>
+    <rect x="504" y="240" width="64" height="7"/>
+    <rect x="504" y="248" width="64" height="7"/>
+    <rect x="504" y="256" width="64" height="7"/>
+    <rect x="504" y="264" width="64" height="7"/>
+    <rect x="504" y="272" width="64" height="7"/>
+    <rect x="504" y="280" width="64" height="7"/>
+    <rect x="504" y="288" width="64" height="7"/>
+    <rect x="504" y="296" width="64" height="7"/>
+    <rect x="504" y="304" width="64" height="7"/>
+    <rect x="504" y="312" width="64" height="7"/>
+    <rect x="504" y="320" width="64" height="7"/>
+    <rect x="504" y="328" width="64" height="7"/>
+    <rect x="504" y="344" width="64" height="7"/>
+    <rect x="504" y="352" width="64" height="7"/>
+    <rect x="504" y="360" width="64" height="7"/>
+    <rect x="576" y="208" width="64" height="7"/>
+    <rect x="576" y="216" width="64" height="7"/>
+    <rect x="576" y="224" width="64" height="7"/>
+    <rect x="576" y="232" width="64" height="7"/>
+    <rect x="576" y="240" width="64" height="7"/>
+    <rect x="576" y="248" width="64" height="7"/>
+    <rect x="576" y="256" width="64" height="7"/>
+    <rect x="576" y="264" width="64" height="7"/>
+    <rect x="576" y="272" width="64" height="7"/>
+    <rect x="576" y="288" width="64" height="7"/>
+    <rect x="576" y="296" width="64" height="7"/>
+    <rect x="576" y="304" width="64" height="7"/>
+    <rect x="576" y="312" width="64" height="7"/>
+    <rect x="576" y="320" width="64" height="7"/>
+    <rect x="576" y="328" width="64" height="7"/>
+    <rect x="576" y="336" width="64" height="7"/>
+    <rect x="576" y="344" width="64" height="7"/>
+    <rect x="576" y="352" width="64" height="7"/>
+    <rect x="576" y="360" width="64" height="7"/>
+  </g>
+  <g class="fa">
+    <rect x="0" y="248" width="64" height="7"/>
+    <rect x="72" y="264" width="64" height="7"/>
+    <rect x="144" y="280" width="64" height="7"/>
+    <rect x="216" y="248" width="64" height="7"/>
+    <rect x="288" y="240" width="64" height="7"/>
+    <rect x="360" y="344" width="64" height="7"/>
+    <rect x="432" y="240" width="64" height="7"/>
+    <rect x="504" y="336" width="64" height="7"/>
+    <rect x="576" y="280" width="64" height="7"/>
+  </g>
+
+  <text x="0" y="404" font-size="23" class="fi">Hydrophobicity, molecular weight and charge</text>
+  <text x="640" y="404" font-size="24" text-anchor="end" class="fi"><tspan class="num">27</tspan> columns</text>
+  <g class="fa2">
+    <rect x="0" y="414" width="64" height="12"/>
+    <rect x="0" y="432" width="64" height="12"/>
+    <rect x="0" y="450" width="64" height="12"/>
+    <rect x="72" y="414" width="64" height="12"/>
+    <rect x="72" y="432" width="64" height="12"/>
+    <rect x="72" y="450" width="64" height="12"/>
+    <rect x="144" y="414" width="64" height="12"/>
+    <rect x="144" y="432" width="64" height="12"/>
+    <rect x="144" y="450" width="64" height="12"/>
+    <rect x="216" y="414" width="64" height="12"/>
+    <rect x="216" y="432" width="64" height="12"/>
+    <rect x="216" y="450" width="64" height="12"/>
+    <rect x="288" y="414" width="64" height="12"/>
+    <rect x="288" y="432" width="64" height="12"/>
+    <rect x="288" y="450" width="64" height="12"/>
+    <rect x="360" y="414" width="64" height="12"/>
+    <rect x="360" y="432" width="64" height="12"/>
+    <rect x="360" y="450" width="64" height="12"/>
+    <rect x="432" y="414" width="64" height="12"/>
+    <rect x="432" y="432" width="64" height="12"/>
+    <rect x="432" y="450" width="64" height="12"/>
+    <rect x="504" y="414" width="64" height="12"/>
+    <rect x="504" y="432" width="64" height="12"/>
+    <rect x="504" y="450" width="64" height="12"/>
+    <rect x="576" y="414" width="64" height="12"/>
+    <rect x="576" y="432" width="64" height="12"/>
+    <rect x="576" y="450" width="64" height="12"/>
+  </g>
+</svg>
+<figcaption><b>Figure 2.3</b> One peptide written three ways: nine columns of alphabet numbering, alanine 1 to tyrosine 20; 180 columns of one-hot, where one cell in twenty is set at each position; and 27 columns of hydrophobicity, molecular weight and charge.</figcaption></figure>
+
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 2.1</b> The three encodings, from <code>pipeline.py</code>, where <code>KD</code>, <code>MW</code> and <code>CH</code> are lookup tables for hydrophobicity, residue molecular weight and charge.</span></summary><pre tabindex="0"><code class="language-python">def enc_ordinal(sequences):
+    return np.array([[ORD.get(aa, 0) for aa in seq] for seq in sequences], dtype=float)
+
+def enc_onehot(sequences):
+    rows = []
+    for seq in sequences:
+        row = []
+        for aa in seq:
+            row += [1 if aa == a else 0 for a in AA20]
+        rows.append(row)
+    return np.array(rows, dtype=float)
+
+def enc_physico(sequences):
+    rows = []
+    for seq in sequences:
+        row = []
+        for aa in seq:
+            row += [KD.get(aa, 0.0), MW.get(aa, 0.0), CH.get(aa, 0.0)]
+        rows.append(row)
+    return np.array(rows, dtype=float)
+</code></pre></details>
+<p>Here is the part that took me a while to see. Chapter 1 never made this choice at all. A tool called AMRFinderPlus
+handed me a finished table of genes present or absent and substitutions found or not. Somebody else had decided what
+counted as a feature. I inherited that decision and never noticed I had.</p>
+<p>A feature matrix is not a fact about nature. It is a claim about what matters.</p>
+<h2 id="how-a-tree-chooses-and-what-stops-it"><span class="secno">2.3</span> How a tree chooses, and what stops it</h2>
+<p>Every textbook gives the same rule for <span class="nw">HLA-A*02:01</span>. Leucine or methionine at position two. GILGFVFTL has neither. It
+binds anyway, and it binds so well that your killer T cells go after it before almost anything else in the virus. The
+rule is not wrong. It is just not the whole story.</p>
+<p>Now watch what happens when a machine tries to learn that rule from data.</p>
+<p>A decision tree gets all 180 columns, and it may ask only one of them first. It chooses by counting.</p>
+<aside class="note">
+<p><strong>Impurity.</strong> How mixed a pile is. A question is scored by how much it lowers the impurity of
+the two piles it creates, and the tree keeps the question with the largest drop. The trees in this chapter measure
+impurity with the Gini index, which is scikit-learn&rsquo;s default.</p>
+</aside>
+<p>Put every measurement in one pile. 15,597 laboratory measurements on this molecule, 8,376 counted as binders and 7,221
+not. The pile is a coin flip. Now ask one question and let the pile fall into two. Ask something irrelevant and
+nothing happens, because both piles come out half and half and you have learned nothing. Ask about leucine at position
+two and one pile should come out mostly binders. The tree tries all 180 questions, measures how much each one tidies
+the piles, and keeps the winner. Then it starts the whole search again inside each pile.</p>
+<p>The tree cannot look ahead. It takes whichever question pays now. A weaker first question might set up a far stronger
+second, and the tree never looks. That is called a greedy search. Most of the time it works, because position two
+really does carry signal on its own, so the tree will find it.</p>
+<p>And then the tree&rsquo;s first question does exactly what the textbook does. It sends GILGFVFTL to the wrong side.</p>
+<p>One awkward peptide would be a footnote. Sidney and colleagues counted fourteen A*0201 epitopes in vaccinia virus and
+reported in 2008 that eight of them did not fit the rule (Figure 2.4).</p>
+<p>Chapter 1 never had this problem. One question about one position in <em>Campylobacter</em> was correct for 99.67% of the
+3,984 isolates I tested. One question, whole model, done.</p>
+<p>Peptides do not hand you that. So the tree asks again. And again. Nothing in the arithmetic tells it when to stop.</p>
+<aside class="note">
+<p><strong>Overfitting.</strong> A model that fits the data in front of it and describes nothing
+else.</p>
+</aside>
+<p>Ask enough questions and every peptide ends up alone in its own group. A group of one is never wrong. A near-perfect
+score on all 15,597 measurements, and worth nothing. A group holding one peptide is not a rule. It is a memory. The
+tree has recorded that this exact sequence bound. It has learned nothing about a sequence it has never seen.</p>
+<p>So what stops the tree? You do. You can cap how many questions deep it may go. You can refuse to split a group below
+some size. Or you can let it grow wild and cut the branches back afterwards, which is called pruning. Every one of
+those is a number you picked. Not one of them came out of the data.</p>
+<p>The honest way to choose is to hide some peptides, fit the tree on the rest, then ask it about the ones it never saw,
+and keep the depth that does best on those. Then do it again with a different part held back, five times over, so that
+every peptide is held back once, and average the five scores. That is cross-validation.</p>
+<figure class="fig" id="fig-2-4"><svg role="img" aria-label="The rule leucine or methionine at position two, with a yes branch to a box reading called a binder and a no branch to a box reading called not a binder. Under the no branch, headed binders the rule gets wrong, the peptide GILGFVFTL with its isoleucine at position two marked, and a row of fourteen squares of which eight are filled in and six are left open." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 448" class="figsvg">
+  <rect x="70" y="4" width="500" height="58" rx="8" class="fp"/>
+  <text x="320" y="42" font-size="24" text-anchor="middle" class="fi">Leucine or methionine at position two</text>
+
+  <g class="sm" stroke-width="2">
+    <line x1="320" y1="62" x2="320" y2="84"/>
+    <line x1="160" y1="84" x2="480" y2="84"/>
+    <line x1="160" y1="84" x2="160" y2="102"/>
+    <line x1="480" y1="84" x2="480" y2="102"/>
+  </g>
+  <g class="fm">
+    <polygon points="153,102 160,116 167,102"/>
+    <polygon points="473,102 480,116 487,102"/>
+  </g>
+  <g class="fm" font-size="22">
+    <text x="150" y="106" text-anchor="end">yes</text>
+    <text x="492" y="106">no</text>
+  </g>
+
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="36" y="118" width="248" height="56" rx="8"/>
+    <rect x="356" y="118" width="248" height="56" rx="8"/>
+  </g>
+  <g class="fi" font-size="23" text-anchor="middle">
+    <text x="160" y="153">Called a binder</text>
+    <text x="480" y="153">Called not a binder</text>
+  </g>
+
+  <line x1="480" y1="174" x2="480" y2="196" class="sm" stroke-width="2"/>
+  <polygon points="473,196 480,210 487,196" class="fm"/>
+
+  <text x="320" y="238" font-size="23" text-anchor="middle" class="fi">Binders the rule gets wrong</text>
+
+  <g class="fp">
+    <rect x="44" y="254" width="56" height="50" rx="6"/>
+    <rect x="168" y="254" width="56" height="50" rx="6"/>
+    <rect x="230" y="254" width="56" height="50" rx="6"/>
+    <rect x="292" y="254" width="56" height="50" rx="6"/>
+    <rect x="354" y="254" width="56" height="50" rx="6"/>
+    <rect x="416" y="254" width="56" height="50" rx="6"/>
+    <rect x="478" y="254" width="56" height="50" rx="6"/>
+    <rect x="540" y="254" width="56" height="50" rx="6"/>
+  </g>
+  <rect x="106" y="254" width="56" height="50" rx="6" class="fb"/>
+  <g class="fi" font-size="28" text-anchor="middle">
+    <text x="72" y="289">G</text>
+    <text x="196" y="289">L</text>
+    <text x="258" y="289">G</text>
+    <text x="320" y="289">F</text>
+    <text x="382" y="289">V</text>
+    <text x="444" y="289">F</text>
+    <text x="506" y="289">T</text>
+    <text x="568" y="289">L</text>
+  </g>
+  <text x="134" y="289" font-size="28" text-anchor="middle" class="fbg">I</text>
+  <text x="320" y="330" font-size="22" text-anchor="middle" class="fm">isoleucine at position two, and it binds</text>
+
+  <g class="fb">
+    <rect x="58" y="356" width="30" height="30" rx="4"/>
+    <rect x="96" y="356" width="30" height="30" rx="4"/>
+    <rect x="134" y="356" width="30" height="30" rx="4"/>
+    <rect x="172" y="356" width="30" height="30" rx="4"/>
+    <rect x="210" y="356" width="30" height="30" rx="4"/>
+    <rect x="248" y="356" width="30" height="30" rx="4"/>
+    <rect x="286" y="356" width="30" height="30" rx="4"/>
+    <rect x="324" y="356" width="30" height="30" rx="4"/>
+  </g>
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="362" y="356" width="30" height="30" rx="4"/>
+    <rect x="400" y="356" width="30" height="30" rx="4"/>
+    <rect x="438" y="356" width="30" height="30" rx="4"/>
+    <rect x="476" y="356" width="30" height="30" rx="4"/>
+    <rect x="514" y="356" width="30" height="30" rx="4"/>
+    <rect x="552" y="356" width="30" height="30" rx="4"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="320" y="414">of fourteen A*0201 epitopes counted in vaccinia virus,</text>
+    <text x="320" y="440">eight did not fit the rule</text>
+  </g>
+</svg>
+<figcaption><b>Figure 2.4</b> The textbook rule for <span class="nw">HLA-A*02:01</span> answers no for GILGFVFTL, which carries isoleucine at position two and binds anyway, and for eight of the fourteen A*0201 epitopes counted in vaccinia virus.</figcaption></figure>
+
+<h2 id="the-rules"><span class="secno">2.4</span> The rules</h2>
+<p>Here is what was fixed, and what I changed after looking.</p>
+<div class="rules"><p class="rh">Rules for this chapter</p>
+<p><strong>Fixed before any modelling.</strong> One allele, <span class="nw">HLA-A*02:01</span>. Peptides nine amino acids long. A measurement below 500
+nanomolar is a binder. Three encodings, compared on the same peptides with the same model. Split by source protein,
+not by row. Depth chosen by grouped cross-validation over depths one to twenty, five folds each, keeping the depth
+with the best cross-validated F1, the score that combines precision and recall.</p>
+<p><strong>Changed after looking.</strong> Keep only the measurements reported in nanomolar. The database holds half-lives, melting
+temperatures and interatomic distances in the same numeric column. Match the allele name exactly instead of asking
+for every name that contains 02:01, because the substring admits molecules from other species and eleven engineered
+point mutants of the human one.</p>
+</div>
+<h2 id="where-this-could-go-wrong"><span class="secno">2.5</span> Where this could go wrong</h2>
+<p>Cross-validation can still be fooled, and here the data does the fooling.</p>
+<p>There are 15,597 measurements and only 9,142 distinct peptides, so 6,455 of those measurements are a repeat reading of
+a peptide already in the set (Figure 2.5). Hide a peptide from the tree and a copy of it may still be sitting in the
+data you trained on. The tree is not being tested then. It is being asked to recall. The repair is to collapse the
+repeats before anything is split, one row for each distinct peptide carrying one label. Choosing that label is a
+problem of its own, and it comes later in this chapter.</p>
+<p>Chapter 1 had the same problem and got away with it. 344 groups of closely related <em>Campylobacter</em> isolates sat on both
+sides of a random split, and it changed nothing: the one question about position 86 was still right 99.65% of the time.
+The model had found the one position that decides resistance, and there was nothing left worth memorising. A tree deep
+enough to memorise has plenty to memorise.</p>
+<figure class="fig" id="fig-2-5"><svg role="img" aria-label="A bar of 15,597 measurements divided into a segment of 9,142 distinct peptides and a segment of 6,455 repeat readings. Below it, the same nine-letter peptide in two boxes, one labelled trained on and one labelled held back, joined by a curve reading the same peptide, in both." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 336" class="figsvg">
+  <text x="0" y="24" font-size="23" class="fi"><tspan class="num">15,597</tspan> measurements</text>
+  <rect x="0" y="36" width="375" height="44" class="fm"/>
+  <rect x="375" y="36" width="265" height="44" class="fa"/>
+  <g text-anchor="middle">
+    <text x="187" y="112" font-size="26" class="fi num">9,142</text>
+    <text x="187" y="142" font-size="22" class="fm">distinct peptides</text>
+    <text x="507" y="112" font-size="26" class="fi num">6,455</text>
+    <text x="507" y="142" font-size="22" class="fm">repeat readings</text>
+  </g>
+
+  <g font-size="23" class="fi" text-anchor="middle">
+    <text x="148" y="190">Trained on</text>
+    <text x="492" y="190">Held back</text>
+  </g>
+  <g class="fp">
+    <rect x="22" y="204" width="252" height="52" rx="8"/>
+    <rect x="366" y="204" width="252" height="52" rx="8"/>
+  </g>
+  <g class="fi" font-size="24" text-anchor="middle">
+    <text x="36" y="238">G</text><text x="64" y="238">I</text><text x="92" y="238">L</text>
+    <text x="120" y="238">G</text><text x="148" y="238">F</text><text x="176" y="238">V</text>
+    <text x="204" y="238">F</text><text x="232" y="238">T</text><text x="260" y="238">L</text>
+    <text x="380" y="238">G</text><text x="408" y="238">I</text><text x="436" y="238">L</text>
+    <text x="464" y="238">G</text><text x="492" y="238">F</text><text x="520" y="238">V</text>
+    <text x="548" y="238">F</text><text x="576" y="238">T</text><text x="604" y="238">L</text>
+  </g>
+  <path d="M148 262 C 148 310, 492 310, 492 262" class="fn sa" stroke-width="2.5"/>
+  <text x="320" y="330" font-size="22" text-anchor="middle" class="fm">the same peptide, in both</text>
+</svg>
+<figcaption><b>Figure 2.5</b> Of the 15,597 measurements in the first cohort, 9,142 were distinct peptides and the other 6,455 were repeat readings, so a peptide held back from the tree could have a copy of itself in the data the tree was trained on.</figcaption></figure>
+
+<p>Then comes the harder version. Not copies. Relatives.</p>
+<p>Change one letter in GILGFVFTL. Is it still the same peptide? Ask the MHC molecule holding it and the answer may be
+yes, because the groove grips position two and position nine, and if you change position five, the grip barely notices.
+Ask a T cell and the answer may be no, because position five points up, out of the groove, straight at the T-cell
+receptor. Same nine letters, two different answers, depending on who is asking (Figure 2.6).</p>
+<p>Those 9,142 peptides came out of 2,874 different proteins, just over three peptides per protein. Split them at random
+and peptides from the same protein land on both sides of the line. The model studies one. Then it gets asked about the
+neighbour.</p>
+<p>The repair is to split by group instead of by row. Every peptide from one protein goes to the same side, training or
+testing, never both. That is grouped splitting. One line of code, and the accuracy usually drops. That drop is the
+point. The old number was scoring the model on neighbours it had already studied, and the new one asks about proteins
+it has never met.</p>
+<p>Grouping by source protein is a guess. Two peptides from different proteins can differ by a single letter, and two from
+the same protein can share almost nothing. The protein is a convenient handle rather than the thing that matters. What
+matters is how similar two sequences are, and the usual fix is to cluster the peptides by sequence identity and split
+whole clusters instead. Then you have to choose the identity threshold. Eighty per cent? Seventy? You have swapped one
+arbitrary line for another.</p>
+<p>So you decide, and then you report a number that is partly a report about your decision. There is no neutral split.</p>
+<figure class="fig" id="fig-2-6"><svg role="img" aria-label="The nine letters of GILGFVFTL in a row of boxes, position two and position nine marked in one colour and position five marked in another under the words change one letter here. Below, two panels: ask the groove, where positions two and nine are unchanged and the answer may be yes, and ask a T cell, where position five points out of the groove at the receptor and the answer may be no." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" class="figsvg">
+  <g class="fp">
+    <rect x="0" y="4" width="64" height="48" rx="6"/>
+    <rect x="144" y="4" width="64" height="48" rx="6"/>
+    <rect x="216" y="4" width="64" height="48" rx="6"/>
+    <rect x="360" y="4" width="64" height="48" rx="6"/>
+    <rect x="432" y="4" width="64" height="48" rx="6"/>
+    <rect x="504" y="4" width="64" height="48" rx="6"/>
+  </g>
+  <g class="fa2">
+    <rect x="72" y="4" width="64" height="48" rx="6"/>
+    <rect x="576" y="4" width="64" height="48" rx="6"/>
+  </g>
+  <rect x="288" y="4" width="64" height="48" rx="6" class="fa"/>
+  <g class="fi" font-size="28" text-anchor="middle">
+    <text x="32" y="39">G</text>
+    <text x="176" y="39">L</text>
+    <text x="248" y="39">G</text>
+    <text x="392" y="39">V</text>
+    <text x="464" y="39">F</text>
+    <text x="536" y="39">T</text>
+  </g>
+  <g class="fbg" font-size="28" text-anchor="middle">
+    <text x="104" y="39">I</text>
+    <text x="320" y="39">F</text>
+    <text x="608" y="39">L</text>
+  </g>
+  <g font-size="22">
+    <text x="104" y="80" text-anchor="middle" class="fa2">position two</text>
+    <text x="320" y="80" text-anchor="middle" class="fa">change one letter here</text>
+    <text x="638" y="80" text-anchor="end" class="fa2">position nine</text>
+  </g>
+
+  <g class="fp">
+    <rect x="0" y="104" width="310" height="182" rx="8"/>
+    <rect x="330" y="104" width="310" height="182" rx="8"/>
+  </g>
+  <g font-size="24" class="fi" text-anchor="middle">
+    <text x="155" y="142">Ask the groove</text>
+    <text x="485" y="142">Ask a T cell</text>
+  </g>
+  <g font-size="22" class="fm" text-anchor="middle">
+    <text x="155" y="180">Positions two and nine</text>
+    <text x="155" y="210">are unchanged, and the</text>
+    <text x="155" y="240">grip barely notices.</text>
+    <text x="485" y="180">Position five points out</text>
+    <text x="485" y="210">of the groove, straight</text>
+    <text x="485" y="240">at the T-cell receptor.</text>
+  </g>
+  <g font-size="22" class="fi" text-anchor="middle">
+    <text x="155" y="270">The answer may be yes.</text>
+    <text x="485" y="270">The answer may be no.</text>
+  </g>
+
+  <text x="320" y="326" font-size="23" text-anchor="middle" class="fi">Two different answers, depending on who is asking.</text>
+</svg>
+<figcaption><b>Figure 2.6</b> One letter changed at position five, with the two gripping positions untouched. The groove may hold the peptide as before, while the T-cell receptor, which position five points straight at, may not. Same nine letters, two answers.</figcaption></figure>
+
+<h2 id="a-column-with-no-unit"><span class="secno">2.6</span> A column with no unit</h2>
+<p>A 45-degree melting point is not a binding affinity.</p>
+<aside class="note">
+<p><strong>Quantitative measurement.</strong> The single numeric column IEDB uses for every assay
+type, with the unit kept somewhere else.</p>
+</aside>
+<p>IEDB, the database that supplies this data, stores measurements from many assay types in the same column. Radioactive
+inhibition assays report affinity in nanomolar. Thermal shift assays report melting temperatures in degrees. Stability
+assays report half-lives in minutes. Structural assays report distances in ångströms. The column is called
+quantitative measurement. No unit is attached.</p>
+<p>A 500-nanomolar threshold on that column does not select binders. It selects numbers below 500.</p>
+<p>Of the 15,597 measurements, 3,874 were not nanomolar, and of those, 3,418 fell below 500 and were labelled binders.
+Among those 3,874 were 2,225 half-lives, 1,087 unitless figures, 333 melting temperatures and 219 interatomic
+distances. A half-life of 23 minutes is a stable complex, not a tight binder, and it was sitting in the training data
+as one.</p>
+<p>The corrected cohort is 11,723 measurements, 8,346 distinct peptides, and 4,958 that bound below 500 nanomolar. That is
+42.29%, not 53.7%. The count of repeat readings falls with it, from 6,455 to 3,377.</p>
+<h2 id="what-the-tree-found"><span class="secno">2.7</span> What the tree found</h2>
+<p>In 1991, somebody stripped the peptides off an MHC molecule and sequenced them all at once. The pattern was unmissable.
+Two positions out of nine did nearly all the gripping.</p>
+<p>The tree found the same two positions. Nobody told it they existed.</p>
+<p>The grouped split put 6,971 of the 8,346 peptides on the training side and the other 1,375 on the test side. The tree
+was given those 6,971 training peptides, nine letters each, and the same 180 columns. That is all. No groove, no
+pockets, no anchors. Nine letters and a label saying bound or did not.</p>
+<p>Its first question was position two, leucine. Then position two again, methionine. Then position nine, valine. Then
+position two, isoleucine. Then position nine, leucine.</p>
+<p>Five questions. Two positions. It had nine to choose from.</p>
+<p>Those two are the pockets. An MHC molecule is the clamp on your cell surface, and the second and ninth residues drop
+into it and hold the fragment still. The tree found the clamp by counting.</p>
+<p>It did not discover it. Falk and colleagues published the pattern in <em>Nature</em> in 1991, thirty-five years ago.</p>
+<p>A tree insisting that position four decides everything would have told me the pipeline was still broken: contaminated
+units, duplicated peptides, relatives sitting on both sides of a split. Any of those shows up as a model confidently
+finding the wrong thing. It found the right thing instead.</p>
+<p>Chapter 1 ended the same way. The model walked to the one position in <em>gyrA</em> that microbiologists have known about for
+decades. Recovering a known answer is a receipt, not a finding.</p>
+<h2 id="what-a-score-is-worth"><span class="secno">2.8</span> What a score is worth</h2>
+<p>I can build you a model that is right 63% of the time and never finds a single binder. It answers no to everything.</p>
+<p>37.2% of the 1,375 peptides in the test set bind. Say no to all of them and you are correct about the other 62.8%.
+Accuracy 0.6284. Binders found: none.</p>
+<p>That 37.2% is a smaller share than the 42.29% above because this one counts peptides, with every repeat reading
+collapsed into one label.</p>
+<p>Accuracy counts how often you were right. It says nothing about what you were right about.</p>
+<p>So you need two numbers instead of one. Of the peptides you called binders, how many actually bound? That is
+precision. Of the peptides that actually bound, how many did you catch? That is recall.</p>
+<p>Either one alone is easy to fake. Call a single peptide a binder and be right about it, and precision is perfect while
+recall is almost nothing. Call everything a binder, and recall is perfect while precision collapses to the share that
+bind. F1 is one number that only rises when both rise. The model that says no to everything scores 0.0000.</p>
+<p>Now the comparison. Every number below comes from the same held-out proteins.</p>
+<p>The textbook rule first. Leucine or methionine at position two, predict binder. Accuracy 0.7542. F1 0.6667. One
+question about one position, and it beats saying no to everything on both counts.</p>
+<p>Then the trees, tested on the same proteins they never saw during training. Nine columns of alphabet numbering, F1
+0.6983. 180 columns of one-hot, F1 0.7153. 27 columns of hydrophobicity, molecular weight and charge, F1 0.7399.</p>
+<p>So yes. The tree beats the rule. One hundred and eighty columns and thirteen levels of questions bought 0.0486 F1 over
+one rule about one position, and the 27 columns of chemistry bought 0.0732. Chapter 1 went the other way, where
+eighty-four features bought nothing. Here the model wins, and that is the size of the win.</p>
+<p>I expected one-hot to win. It did not. I am saying so after the scores, and without the note I said I would write, so
+it is not a prediction.</p>
+<h2 id="why-the-smallest-encoding-won"><span class="secno">2.9</span> Why the smallest encoding won</h2>
+<p>To one of my encodings, leucine and isoleucine were neighbours. To another they were strangers. That difference decided
+which model won.</p>
+<p>I wrote down the cost of one-hot as a caveat before anything ran. It turned out to be the result.</p>
+<p>Look at how deep each tree had to go. Chemistry needed seven levels of questions. One-hot needed thirteen.</p>
+<p>That is the mechanism. A tree using chemistry asks one question. Is this position hydrophobic. That catches leucine,
+isoleucine, valine and methionine at once. A tree using one-hot has to ask about each of them separately, four
+questions to say what the other tree said in one.</p>
+<p>The MHC groove does not read letters. It has a pocket with a shape and a chemistry, and any residue that fits, fits. An
+encoding that describes shape and chemistry sits closer to what the molecule is doing than one that spells names.</p>
+<p>One caution before anyone generalises this. Three physicochemical properties per position is a choice I made before
+seeing any result, and a different three might do better or worse. This is one comparison, on one allele, with one
+model.</p>
+<h2 id="the-depth-i-reported"><span class="secno">2.10</span> The depth I reported</h2>
+<p>Eight questions deep scores a cross-validated F1 of 0.7095. Thirteen questions deep scores 0.7118. Both are the
+one-hot tree. I reported thirteen. I am not certain that was right.</p>
+<p>A decision tree needs a depth limit. Without one, the one-hot tree kept splitting until every group agreed with itself,
+which took 1,140 groups for 6,971 training peptides, and its accuracy on them was 1.0000. On peptides it had not seen,
+that same tree scored 0.7789 for accuracy, and the one I kept scored 0.7927.</p>
+<p>So I tested every depth from one to twenty, five times each, on peptides held back from different proteins each time,
+and kept the depth with the best cross-validated F1. Thirteen won (Figure 2.7).</p>
+<p>The sweep ran over all 8,346 peptides, and the training and test split was drawn after it, so the 1,375 test peptides
+sat inside the folds the depth was chosen on. The trees scored earlier in this chapter were fitted on the training
+peptides alone, and every fold of the sweep held its own peptides back while its tree was fitted, but the depth those
+trees were given had been chosen over a cohort that included the test peptides. Of everything I report, the depth is the
+one choice the test set helped make.</p>
+<p>Now look at the curve it won on. The score climbs steeply to about depth eight. After that it is almost flat. Depth
+eight to depth thirteen buys 0.0023. Five extra levels of questions for two thousandths.</p>
+<aside class="note">
+<p><strong>The one-standard-error rule.</strong> Take the simplest model within one standard error of
+the best one.</p>
+</aside>
+<p>There is a standard rule for exactly this situation, and it exists because a flat plateau is mostly noise, and the peak
+of noise is not a real peak. Under that rule I would have reported depth eight: a tree half as deep, easier to read,
+almost the same score.</p>
+<p>So why did I report thirteen? Because the rule I wrote down beforehand said take the maximum, and I only saw the
+plateau afterwards. Changing the rule after seeing the answer is how you get results that do not replicate. Even when
+the new rule is better. Even when you are certain your motives are clean.</p>
+<p>Both numbers are in the repository. Depth thirteen is the reported one because it is the pre-specified one.</p>
+<p>Notice what this is not. It is not a data problem, or a modelling error, or something a better pipeline would catch. It
+is a judgement, made by me, that changes the number I publish. There is no neutral depth either.</p>
+<figure class="fig" id="fig-2-7"><svg role="img" aria-label="Two bars of cross-validated F1 for the one-hot tree on an axis from zero, one for eight questions deep at 0.7095 and one for thirteen questions deep at 0.7118, the two almost the same length." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 288" class="figsvg">
+  <g font-size="22">
+    <text x="0" y="24" class="fi">Eight questions deep</text>
+    <rect x="0" y="35" width="461.2" height="26" class="fm"/>
+    <text x="476" y="56" class="fi num">0.7095</text>
+
+    <text x="0" y="104" class="fi">Thirteen questions deep</text>
+    <rect x="0" y="115" width="462.7" height="26" class="fa"/>
+    <text x="478" y="136" class="fi num">0.7118</text>
+  </g>
+  <g class="sm" stroke-width="1.2">
+    <line x1="0" y1="162" x2="520" y2="162"/>
+    <line x1="0" y1="162" x2="0" y2="171"/><line x1="130" y1="162" x2="130" y2="171"/>
+    <line x1="260" y1="162" x2="260" y2="171"/><line x1="390" y1="162" x2="390" y2="171"/>
+    <line x1="520" y1="162" x2="520" y2="171"/>
+  </g>
+  <g class="fm num" font-size="22" text-anchor="middle">
+    <text x="7" y="199">0</text><text x="130" y="199">0.2</text><text x="260" y="199">0.4</text>
+    <text x="390" y="199">0.6</text><text x="520" y="199">0.8</text>
+  </g>
+  <text x="0" y="241" font-size="22" class="fm">Cross-validated F1 for the one-hot tree</text>
+  <text x="0" y="273" font-size="22" class="fi">Five extra levels of questions for <tspan class="num">0.0023</tspan></text>
+</svg>
+<figcaption><b>Figure 2.7</b> Two points on the one-hot tree’s cross-validation curve, eight questions deep at 0.7095 and thirteen questions deep at 0.7118. The sweep tested every depth from one to twenty, five times each on peptides from different proteins, and thirteen took the best score.</figcaption></figure>
+
+<h2 id="which-mistakes-it-makes"><span class="secno">2.11</span> Which mistakes it makes</h2>
+<p>My best model missed 117 real binders. My second best missed 153. There are 511 binders in the test set, so those are
+both bad numbers. They are bad in different ways, and F1 cannot tell you how.</p>
+<p>1,375 peptides. 511 bind. 864 do not.</p>
+<p>The chemistry model called 554 of them binders. 394 of those calls were right and 160 were wrong. The one-hot model was
+more cautious. It called 490 binders, and 358 were right. Being cautious cost it: it missed 153 real binders where
+chemistry missed 117. So chemistry catches 36 more binders than one-hot and raises 28 more false alarms doing it. That
+is the trade underneath a gap of 0.0246 in F1.</p>
+<p>Precision: chemistry 0.7112, one-hot 0.7306. Recall: chemistry 0.7710, one-hot 0.7006. One-hot is the better guesser.
+Chemistry is the better finder.</p>
+<p>Which one you want depends on what a mistake costs, and nothing in the data can tell you that. A false alarm is one
+assay you run and throw away. A missed binder is a peptide you never look at again. For screening vaccine candidates,
+those two prices are nowhere near equal. Twenty-eight more assays would be cheap. Thirty-six peptides you never test
+could include the one that mattered.</p>
+<p>Now the textbook rule, on the same 1,375 peptides. Leucine or methionine at position two catches 338 binders and raises
+165 false alarms (Figure 2.8). Chemistry catches 56 more than that, and raises 5 fewer. Better on both counts at once.
+No trade, no judgement call, just better.</p>
+<p>That is the clearest thing this chapter has produced, and it took 27 columns and seven levels of questions.</p>
+<figure class="fig" id="fig-2-8"><svg role="img" aria-label="Four bars on one count axis starting at zero. Binders caught: the chemistry tree 394 and the position two rule 338, with a dashed line marking the 511 peptides that bind. False alarms raised: the chemistry tree 160 and the position two rule 165." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 452" class="figsvg">
+  <text x="0" y="24" font-size="23" class="fi">Binders caught</text>
+  <text x="451" y="24" font-size="22" class="fm"><tspan class="num">511</tspan> bind</text>
+  <line x1="442.9" y1="36" x2="442.9" y2="180" class="sm" stroke-width="1.2" stroke-dasharray="5 5"/>
+
+  <g font-size="22">
+    <text x="0" y="58" class="fi">The chemistry tree</text>
+    <rect x="0" y="69" width="341.3" height="26" class="fa"/>
+    <text x="355" y="90" class="fi num">394</text>
+
+    <text x="0" y="138" class="fi">The position two rule</text>
+    <rect x="0" y="149" width="292.9" height="26" class="fm"/>
+    <text x="307" y="170" class="fi num">338</text>
+  </g>
+
+  <text x="0" y="224" font-size="23" class="fi">False alarms raised</text>
+  <g font-size="22">
+    <text x="0" y="258" class="fi">The chemistry tree</text>
+    <rect x="0" y="269" width="138.7" height="26" class="fa"/>
+    <text x="153" y="290" class="fi num">160</text>
+
+    <text x="0" y="338" class="fi">The position two rule</text>
+    <rect x="0" y="349" width="143" height="26" class="fm"/>
+    <text x="157" y="370" class="fi num">165</text>
+  </g>
+
+  <g class="sm" stroke-width="1.2">
+    <line x1="0" y1="400" x2="520" y2="400"/>
+    <line x1="0" y1="400" x2="0" y2="409"/><line x1="173.3" y1="400" x2="173.3" y2="409"/>
+    <line x1="346.7" y1="400" x2="346.7" y2="409"/><line x1="520" y1="400" x2="520" y2="409"/>
+  </g>
+  <g class="fm num" font-size="22" text-anchor="middle">
+    <text x="7" y="437">0</text><text x="173.3" y="437">200</text>
+    <text x="346.7" y="437">400</text><text x="520" y="437">600</text>
+  </g>
+  <text x="640" y="437" font-size="22" text-anchor="end" class="fm">peptides</text>
+</svg>
+<figcaption><b>Figure 2.8</b> Of the 511 binders in the test set, the chemistry tree caught 394 and the position two rule caught 338. The tree raised 160 false alarms and the rule 165, both counted on the same held-out proteins.</figcaption></figure>
+
+<h2 id="peptides-that-disagree-with-themselves"><span class="secno">2.12</span> Peptides that disagree with themselves</h2>
+<p>127 peptides in this dataset disagree with themselves. They were measured more than once, and one result says binder
+while another says not. I expected that number to be far worse.</p>
+<p>8,346 distinct nine-mers sit in the corrected cohort, and 2,660 of them were measured more than once, in different
+labs, in different years, with different reagents. Nearly a third of the dataset. For most of them the repeats agree.
+Two readings of 15 and 40 nanomolar both say binder. Two at 6,000 and 12,000 both say not. 127 do not agree, because
+one reading falls below 500 nanomolar and another falls above it. Same nine amino acids. Same molecule. Two answers.
+That is 4.8% of the repeat-measured peptides.</p>
+<p>So what do you do with 127 peptides that contradict themselves? You cannot keep both readings, because the model would
+see the same nine letters labelled two ways and learn nothing from either. You cannot drop them either, because that
+deletes the peptides sitting nearest the line, and those are the ones a binding model most needs to get right.</p>
+<p>I took the median of every peptide&rsquo;s measurements and labelled that. Three readings of 200, 400 and 900 become 400, and
+400 is a binder (Figure 2.9). It is a defensible choice. It is still a choice, and a different one would give a
+different training set.</p>
+<p>Now the part worth sitting with. A binding affinity comes out of an assay, run by people, with reagents that vary. Run
+it twice and you get two numbers. Draw a line anywhere through the middle of them and some pairs will land on opposite
+sides. Those 127 peptides are what measurement looks like when you stop rounding it off. Move the threshold and a
+different set of peptides straddles it. The disagreement does not go away. It relocates.</p>
+<figure class="fig" id="fig-2-9"><svg role="img" aria-label="A number line from zero to one thousand nanomolar carrying three readings of one peptide, at 200, 400 and 900, with the 500-nanomolar threshold drawn across it and the middle reading ringed as the median." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 282" class="figsvg">
+  <text x="318" y="28" font-size="22" text-anchor="middle" class="fa2"><tspan class="num">500</tspan>-nanomolar threshold</text>
+  <line x1="318" y1="42" x2="318" y2="138" class="sa2" stroke-width="2"/>
+
+  <g class="fi num" font-size="24" text-anchor="middle">
+    <text x="141.6" y="92">200</text>
+    <text x="259.2" y="92">400</text>
+    <text x="553.2" y="92">900</text>
+  </g>
+  <line x1="24" y1="120" x2="612" y2="120" class="sm" stroke-width="1.5"/>
+  <g class="fa">
+    <circle cx="141.6" cy="120" r="9"/>
+    <circle cx="259.2" cy="120" r="9"/>
+  </g>
+  <circle cx="553.2" cy="120" r="9" class="fm"/>
+  <circle cx="259.2" cy="120" r="18" class="fn sa" stroke-width="3"/>
+
+  <g class="sm" stroke-width="1.2">
+    <line x1="24" y1="120" x2="24" y2="130"/><line x1="171" y1="120" x2="171" y2="130"/>
+    <line x1="318" y1="120" x2="318" y2="130"/><line x1="465" y1="120" x2="465" y2="130"/>
+    <line x1="612" y1="120" x2="612" y2="130"/>
+  </g>
+  <g class="fm num" font-size="22" text-anchor="middle">
+    <text x="24" y="158">0</text><text x="171" y="158">250</text><text x="318" y="158">500</text>
+    <text x="465" y="158">750</text><text x="612" y="158">1000</text>
+  </g>
+  <text x="259.2" y="192" font-size="22" text-anchor="middle" class="fa">median</text>
+  <text x="612" y="192" font-size="22" text-anchor="end" class="fm">nanomolar</text>
+
+  <text x="320" y="252" font-size="23" text-anchor="middle" class="fi">The median is <tspan class="num">400</tspan>, so the peptide is labelled a binder.</text>
+</svg>
+<figcaption><b>Figure 2.9</b> Three readings of one peptide, at 200, 400 and 900 nanomolar, against the 500-nanomolar threshold. Two fall below it and one above, and the median, 400, is the label the peptide was given.</figcaption></figure>
+
+<h2 id="the-allele-filter"><span class="secno">2.13</span> The allele filter</h2>
+<p>My human dataset contained 263 measurements from a rhesus macaque. Also horse. Also cattle. Also chicken.</p>
+<p>None of that was a download error. I wrote one line of code that let them in.</p>
+<p>The allele I am studying is <span class="nw">HLA-A*02:01</span>. To pull its measurements out of a nine-gigabyte file, I asked for every row
+whose allele name contains 02:01. That is the natural thing to write, and it is wrong.</p>
+<p><span class="nw">Mamu-A1*002:01</span> is a macaque molecule. <span class="nw">Eqca-1*002:01</span> is horse. <span class="nw">BoLA-3*002:01</span> is cattle. <span class="nw">Gaga-BF2*002:01</span> is chicken.
+All of them contain 02:01, because the naming is done per species. The number after the
+asterisk identifies an allele within its own species, not across them. Two different species can both have an 02:01
+and share nothing but the label.</p>
+<p>Then there were eleven more. <span class="nw">HLA-A*02:01 K66A</span> and <span class="nw">HLA-A*02:01 A150P</span> are point mutants, engineered in a lab, one
+amino acid changed inside the groove. Those are human, and they are the same allele, and they are still the wrong
+molecule. The whole point of mutating position 66 is to change what binds there.</p>
+<p>Together they added 302 measurements and 262 peptides that do not belong. Matching the allele name exactly removed all
+of them and reproduced my feasibility scan to the row. The cohort of 11,723 is what the exact match leaves, so none of
+those rows are in it. Listing 2.2 shows the filter.</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 2.2</b> The exact allele match, from <code>pipeline.py</code>.</span></summary><pre tabindex="0"><code class="language-python">ALLELE     = &quot;HLA-A*02:01&quot;  # Exact string, deliberately not a substring match.
+                            # Matching on &quot;02:01&quot; also picks up Mamu-A1*002:01
+                            # (macaque), Eqca-1*002:01 (horse), BoLA-3*002:01,
+                            # Gaga-BF2*002:01 and eleven point mutants of
+                            # HLA-A*02:01 itself (K66A, A150P and so on). Those
+                            # are different grooves on different molecules.
+</code></pre></details>
+<p>Unit contamination announced itself. Melting points and half-lives sit in the wrong column, and a check catches them.
+This did not announce itself. Every one of those rows is a real peptide, measured properly, against a real MHC
+molecule. Nothing is corrupt. They are simply not the molecule I said I was studying, and a model would have learned
+from them happily. The nomenclature was doing exactly what it was designed to do, and my filter was the thing making
+the claim.</p>
+<p>A substring is not an identifier.</p>
+<p>That is where this chapter ends. Not on the model that worked, but on the filter that almost let a macaque define a
+human molecule. Everything is in the repository: the corrected cohort, the three encodings, every metrics file and
+every number I got wrong on the way. Chapter 3 asks what happens when two annotation tools read the same genome and
+disagree about what is in it.</p>
+<p class="prov">This chapter is rewritten from the posts for Days 12 to 25 of the series.</p>
+
+<h2 id="references">References</h2>
+<p>Falk, K., Rötzschke, O., Stevanović, S., Jung, G. and Rammensee, H.-G. (1991). Allele-specific motifs revealed by
+sequencing of self-peptides eluted from MHC molecules. <em>Nature</em>, 351(6324), 290-296.
+<a href="https://doi.org/10.1038/351290a0">https://doi.org/10.1038/351290a0</a></p>
+<p>Sidney, J., Assarsson, E., Moore, C., Ngo, S., Pinilla, C., Sette, A. and Peters, B. (2008). Quantitative peptide
+binding motifs for 19 human and mouse MHC class I molecules derived using positional scanning combinatorial peptide
+libraries. <em>Immunome Research</em>, 4, 2. <a href="https://doi.org/10.1186/1745-7580-4-2">https://doi.org/10.1186/1745-7580-4-2</a></p></div><section class="endm"><div class="run"><p class="eh">Run it</p>
+<p><span class="lbl">Repository</span> <a href="https://github.com/Qasim-Hussain-Code/peptide_mhc_binding_prediction">peptide_mhc_binding_prediction</a></p>
+<p><span class="lbl">Commit</span> <a href="https://github.com/Qasim-Hussain-Code/peptide_mhc_binding_prediction/tree/d701b62eb203"><code>d701b62eb203</code></a></p></div>
+<div class="cite"><p class="eh">Cite this chapter</p><p>Hussain, Q. (2026). What does a cell show to the immune system? In <i>Machine Learning for Biology</i>, chapter 2.</p></div></section><nav class="pn" aria-label="Previous and next"><a class="prev" href="chapter-1.html"><span>Previous</span>Chapter 1: Predicting antibiotic resistance from a genome</a><a class="next" href="chapter-3.html"><span>Next</span>Chapter 3: Is a gene a fact or a call?</a></nav></main></div>
+<script src="assets/book.js"></script></body></html>

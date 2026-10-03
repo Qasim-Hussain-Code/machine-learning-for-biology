@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 368" class="figsvg">
+  <!-- Figure 7.1: where the labels go. Before this chapter they trained the model; here they go round it, to the comparison. -->
+  <g font-size="22" class="fm">
+    <text x="0" y="22">Chapters 1 to 6</text>
+    <text x="0" y="222">This chapter</text>
+  </g>
+
+  <g class="fp sl" stroke-width="1.5">
+    <rect x="1" y="38" width="178" height="48" rx="6"/>
+    <rect x="237" y="38" width="158" height="48" rx="6"/>
+    <rect x="453" y="38" width="186" height="48" rx="6"/>
+    <rect x="1" y="238" width="178" height="48" rx="6"/>
+    <rect x="237" y="238" width="158" height="48" rx="6"/>
+    <rect x="453" y="238" width="186" height="48" rx="6"/>
+    <rect x="453" y="318" width="186" height="48" rx="6"/>
+  </g>
+  <g class="fp sa" stroke-width="2">
+    <rect x="1" y="118" width="178" height="48" rx="6"/>
+    <rect x="1" y="318" width="178" height="48" rx="6"/>
+  </g>
+
+  <g class="sm" stroke-width="1.6">
+    <line x1="180" y1="62" x2="226" y2="62"/>
+    <line x1="396" y1="62" x2="442" y2="62"/>
+    <line x1="180" y1="262" x2="226" y2="262"/>
+    <line x1="396" y1="262" x2="442" y2="262"/>
+    <line x1="546" y1="287" x2="546" y2="307"/>
+  </g>
+  <g class="fm">
+    <polygon points="236,62 225,56 225,68"/>
+    <polygon points="452,62 441,56 441,68"/>
+    <polygon points="236,262 225,256 225,268"/>
+    <polygon points="452,262 441,256 441,268"/>
+    <polygon points="546,317 540,306 552,306"/>
+  </g>
+
+  <g class="fn sa" stroke-width="2">
+    <path d="M 180 142 H 316 V 98"/>
+    <path d="M 180 342 H 441"/>
+  </g>
+  <g class="fa">
+    <polygon points="316,87 310,99 322,99"/>
+    <polygon points="452,342 440,336 440,348"/>
+  </g>
+
+  <g font-size="22" class="fi" text-anchor="middle">
+    <text x="90" y="70">Data</text>
+    <text x="316" y="70">Model</text>
+    <text x="546" y="70">Predictions</text>
+    <text x="90" y="150">Labels</text>
+    <text x="90" y="270">Gene expression</text>
+    <text x="316" y="270">k-means</text>
+    <text x="546" y="270">Groups</text>
+    <text x="90" y="350">Ten labels</text>
+    <text x="546" y="350">Compared</text>
+  </g>
+</svg>

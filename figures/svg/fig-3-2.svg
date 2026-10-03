@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 438" class="figsvg">
+  <!-- Figure 3.2: the rule that built the label, as three cases. Each row is one Bakta protein-coding call (upper arrow)
+       and what Prokka annotated at the same place (lower arrow); an arrow points along the strand it sits on. -->
+  <polygon points="0,6 30,6 42,17 30,28 0,28" class="fa"/>
+  <polygon points="0,42 30,42 42,53 30,64 0,64" class="fa2"/>
+  <g font-size="22" class="fi">
+    <text x="56" y="25">Bakta's call of a protein-coding gene</text>
+    <text x="56" y="61">Prokka's annotation, of any kind</text>
+  </g>
+
+  <g class="sl" stroke-width="1.2">
+    <line x1="0" y1="86" x2="640" y2="86"/>
+    <line x1="0" y1="206" x2="640" y2="206"/>
+    <line x1="0" y1="326" x2="640" y2="326"/>
+  </g>
+
+  <!-- 1: same strand, a different start -->
+  <polygon points="0,106 272,106 290,118 272,130 0,130" class="fa"/>
+  <polygon points="56,144 272,144 290,156 272,168 56,168" class="fa2"/>
+  <!-- 2: same strand, a transfer RNA sharing a single base at the end of the call -->
+  <polygon points="0,226 232,226 250,238 232,250 0,250" class="fa"/>
+  <polygon points="244,264 282,264 300,276 282,288 244,288" class="fa2"/>
+  <line x1="247" y1="220" x2="247" y2="294" class="sm" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <!-- 3: Prokka's only call here is on the other strand -->
+  <polygon points="0,346 272,346 290,358 272,370 0,370" class="fa"/>
+  <polygon points="290,384 18,384 0,396 18,408 290,408" class="fa2"/>
+
+  <g font-size="24" class="fi">
+    <text x="320" y="126">Matched</text>
+    <text x="320" y="246">Matched</text>
+    <text x="320" y="366">A call Prokka did not make</text>
+  </g>
+  <g font-size="22" class="fm">
+    <text x="320" y="156">Same strand, a different start,</text>
+    <text x="320" y="182">recorded beside the label</text>
+    <text x="320" y="276">Same strand, a transfer RNA</text>
+    <text x="320" y="302">sharing a single base</text>
+    <text x="320" y="396">Prokka's only call here is</text>
+    <text x="320" y="422">on the other strand</text>
+  </g>
+</svg>

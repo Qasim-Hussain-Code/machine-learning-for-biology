@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 410" class="figsvg">
+  <g>
+    <rect x="0" y="0" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="0" width="7" height="92" class="fa"/>
+    <text x="26" y="38" font-size="27" class="fi">Decision trees</text>
+    <text x="632" y="38" font-size="22" text-anchor="end" class="fa">This chapter</text>
+    <text x="26" y="70" font-size="23" class="fm">the rules they learn</text>
+  </g>
+  <g>
+    <rect x="0" y="106" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="106" width="7" height="92" class="fl"/>
+    <text x="26" y="144" font-size="27" class="fi">Random forests</text>
+    <text x="26" y="176" font-size="23" class="fm">what is lost when a model can no longer be read</text>
+  </g>
+  <g>
+    <rect x="0" y="212" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="212" width="7" height="92" class="fl"/>
+    <text x="26" y="250" font-size="27" class="fi">Gradient boosting</text>
+    <text x="26" y="282" font-size="23" class="fm">a label that is two numbers together</text>
+  </g>
+  <g>
+    <rect x="0" y="318" width="640" height="92" rx="8" class="fp"/>
+    <rect x="0" y="318" width="7" height="92" class="fl"/>
+    <text x="26" y="356" font-size="27" class="fi">Support vector machines</text>
+    <text x="26" y="388" font-size="23" class="fm">the geometry of a decision boundary</text>
+  </g>
+</svg>

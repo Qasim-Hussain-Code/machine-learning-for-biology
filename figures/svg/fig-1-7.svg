@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 520" class="figsvg">
+  <!-- Figure 1.7: the passenger search applied to two genes. Both pass the same two checks and get the same verdict,
+       which is right for the beta-lactamase and wrong for cmeB, part of the efflux pump. -->
+  <g class="fp">
+    <rect x="0" y="0" width="300" height="88" rx="8"/>
+    <rect x="340" y="0" width="300" height="88" rx="8"/>
+  </g>
+  <g class="fi" font-size="26" font-style="italic" text-anchor="middle">
+    <text x="150" y="38">blaOXA-493</text>
+    <text x="490" y="38">cmeB</text>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="150" y="72"><tspan class="num" font-size="24">5</tspan> isolates, all resistant</text>
+    <text x="490" y="72"><tspan class="num" font-size="24">6</tspan> isolates, all resistant</text>
+  </g>
+
+  <g class="sm" stroke-width="2">
+    <line x1="150" y1="88" x2="150" y2="116"/><line x1="490" y1="88" x2="490" y2="116"/>
+    <line x1="150" y1="186" x2="150" y2="214"/><line x1="490" y1="186" x2="490" y2="214"/>
+    <line x1="150" y1="316" x2="150" y2="344"/><line x1="490" y1="316" x2="490" y2="344"/>
+  </g>
+  <g class="fm">
+    <polygon points="143,116 150,130 157,116"/><polygon points="483,116 490,130 497,116"/>
+    <polygon points="143,214 150,228 157,214"/><polygon points="483,214 490,228 497,214"/>
+    <polygon points="143,344 150,358 157,344"/><polygon points="483,344 490,358 497,344"/>
+  </g>
+
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="1" y="130" width="638" height="56" rx="8"/>
+    <rect x="1" y="228" width="638" height="88" rx="8"/>
+  </g>
+  <text x="320" y="166" font-size="24" text-anchor="middle" class="fi">Appears only in isolates the rule calls resistant</text>
+  <text x="320" y="264" font-size="24" text-anchor="middle" class="fi">Not on the hand-typed list of mechanisms</text>
+  <text x="320" y="298" font-size="22" text-anchor="middle" class="fm"><tspan font-style="italic">gyrA</tspan>, <tspan font-style="italic">parC</tspan>, <tspan font-style="italic">tet</tspan>, 23S, <tspan font-style="italic">erm</tspan></text>
+
+  <rect x="0" y="358" width="640" height="56" rx="8" class="fa"/>
+  <text x="320" y="394" font-size="24" text-anchor="middle" class="fbg">Flagged as a passenger</text>
+
+  <rect x="1" y="439" width="298" height="78" rx="8" class="fn sa" stroke-width="2"/>
+  <rect x="341" y="439" width="298" height="78" rx="8" class="fn sb" stroke-width="2"/>
+  <text x="150" y="470" font-size="24" text-anchor="middle" class="fa">Right</text>
+  <text x="490" y="470" font-size="24" text-anchor="middle" class="fb">Wrong</text>
+  <g class="fi" font-size="22" text-anchor="middle">
+    <text x="150" y="502">a beta-lactamase</text>
+    <text x="490" y="502">part of the efflux pump</text>
+  </g>
+</svg>

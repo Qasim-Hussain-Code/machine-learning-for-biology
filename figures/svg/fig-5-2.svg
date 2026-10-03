@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 344" class="figsvg">
+  <g font-size="22">
+    <text x="0" y="24" class="fi">A decision tree</text>
+    <text x="0" y="52" class="fm">one threshold, then another</text>
+    <text x="340" y="24" class="fi">A support vector machine</text>
+    <text x="340" y="52" class="fm">a line down the widest gap</text>
+  </g>
+  <rect x="0" y="70" width="300" height="220" class="fp"/>
+  <rect x="340" y="70" width="300" height="220" class="fp"/>
+  <path d="M0 242.5 H122 V168.8 H208 V119 H300" class="fn si" stroke-width="2.5"/>
+  <polygon points="340,265 600,70 640,70 640,95 380,290 340,290" class="fl"/>
+  <g class="fn sm" stroke-width="1.5" stroke-dasharray="6 5">
+    <line x1="340" y1="265" x2="600" y2="70"/>
+    <line x1="380" y1="290" x2="640" y2="95"/>
+  </g>
+  <line x1="343.3" y1="290" x2="636.7" y2="70" class="si" stroke-width="2.5"/>
+  <g class="fa">
+    <circle cx="70" cy="212.5" r="7"/>
+    <circle cx="190" cy="122.5" r="7"/>
+    <circle cx="30" cy="110" r="7"/>
+    <circle cx="80" cy="100" r="7"/>
+    <circle cx="40" cy="170" r="7"/>
+    <circle cx="130" cy="95" r="7"/>
+    <circle cx="120" cy="150" r="7"/>
+    <circle cx="25" cy="220" r="7"/>
+    <circle cx="180" cy="90" r="7"/>
+    <circle cx="75" cy="145" r="7"/>
+  </g>
+  <g class="fa2">
+    <rect x="133.5" y="208.5" width="13" height="13"/>
+    <rect x="263.5" y="253.5" width="13" height="13"/>
+    <rect x="193.5" y="258.5" width="13" height="13"/>
+    <rect x="253.5" y="173.5" width="13" height="13"/>
+    <rect x="103.5" y="258.5" width="13" height="13"/>
+    <rect x="223.5" y="213.5" width="13" height="13"/>
+    <rect x="273.5" y="133.5" width="13" height="13"/>
+    <rect x="163.5" y="253.5" width="13" height="13"/>
+    <rect x="213.5" y="178.5" width="13" height="13"/>
+  </g>
+  <g class="fa">
+    <circle cx="410" cy="212.5" r="7"/>
+    <circle cx="530" cy="122.5" r="7"/>
+    <circle cx="370" cy="110" r="7"/>
+    <circle cx="420" cy="100" r="7"/>
+    <circle cx="380" cy="170" r="7"/>
+    <circle cx="470" cy="95" r="7"/>
+    <circle cx="460" cy="150" r="7"/>
+    <circle cx="365" cy="220" r="7"/>
+    <circle cx="520" cy="90" r="7"/>
+    <circle cx="415" cy="145" r="7"/>
+  </g>
+  <g class="fa2">
+    <rect x="473.5" y="208.5" width="13" height="13"/>
+    <rect x="603.5" y="253.5" width="13" height="13"/>
+    <rect x="533.5" y="258.5" width="13" height="13"/>
+    <rect x="593.5" y="173.5" width="13" height="13"/>
+    <rect x="443.5" y="258.5" width="13" height="13"/>
+    <rect x="563.5" y="213.5" width="13" height="13"/>
+    <rect x="613.5" y="133.5" width="13" height="13"/>
+    <rect x="503.5" y="253.5" width="13" height="13"/>
+    <rect x="553.5" y="178.5" width="13" height="13"/>
+  </g>
+  <g class="fn si" stroke-width="1.8">
+    <circle cx="410" cy="212.5" r="12.5"/>
+    <circle cx="530" cy="122.5" r="12.5"/>
+    <circle cx="480" cy="215" r="12.5"/>
+  </g>
+  <circle cx="8" cy="324" r="7" class="fa"/>
+  <rect x="112.5" y="317.5" width="13" height="13" class="fa2"/>
+  <circle cx="212" cy="324" r="12.5" class="fn si" stroke-width="1.8"/>
+  <g font-size="22" class="fi">
+    <text x="24" y="331">healthy</text>
+    <text x="134" y="331">sick</text>
+    <text x="234" y="331">support vector</text>
+  </g>
+</svg>

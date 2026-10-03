@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 276" class="figsvg">
+  <text x="378" y="24" font-size="22" text-anchor="middle" class="fi"><tspan class="num" font-size="24">600</tspan> substances listed in the panel</text>
+  <path d="M117 48 V38 H639 V48" class="fn sm" stroke-width="1.5"/>
+
+  <path d="M108 59 H101 V187 H108" class="fn sm" stroke-width="1.5"/>
+  <text x="90" y="118" font-size="24" text-anchor="end" class="fi num">750</text>
+  <text x="90" y="146" font-size="22" text-anchor="end" class="fi">patients</text>
+
+  <rect x="116" y="58" width="353.7" height="130" class="fl"/>
+  <rect x="470.45" y="58.75" width="168.8" height="128.5" class="fn sm" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <rect x="146" y="58" width="3.49" height="130" class="fa"/>
+
+  <g font-size="22" text-anchor="middle" class="fi">
+    <text x="294" y="118"><tspan class="num" font-size="24">405</tspan> measured</text>
+    <text x="294" y="146">in every patient</text>
+  </g>
+  <g font-size="22" text-anchor="middle" class="fm">
+    <text x="555" y="104"><tspan class="num" font-size="24">195</tspan> absent</text>
+    <text x="555" y="132">for every</text>
+    <text x="555" y="160">patient</text>
+  </g>
+
+  <line x1="147.75" y1="188" x2="147.75" y2="206" class="sa" stroke-width="1.5"/>
+  <g font-size="22" class="fa">
+    <text x="136" y="232">TMAO and its three precursors,</text>
+    <text x="136" y="260">choline, betaine and carnitine</text>
+  </g>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 404" class="figsvg">
+  <!-- Figure 3.4: one name, written identically by both tools, where only one record has its gene symbol field filled.
+       The first rule stripped each record's own symbol, so only one side was shortened; the fixed rule builds one
+       symbol list per pair from both tools and strips it from both sides. -->
+  <g font-size="22" class="fm" text-anchor="middle">
+    <text x="150" y="24">symbol field filled</text>
+    <text x="490" y="24">symbol field empty</text>
+  </g>
+  <g class="fp sl" stroke-width="1.5">
+    <rect x="1" y="38" width="298" height="54" rx="8"/>
+    <rect x="341" y="38" width="298" height="54" rx="8"/>
+  </g>
+
+  <g font-size="22" class="fi">
+    <text x="0" y="138">First rule: each record strips the symbol in its own field</text>
+    <text x="0" y="288">Fixed rule: one symbol list from both tools, used on both</text>
+  </g>
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="1" y="152" width="298" height="54" rx="8"/>
+    <rect x="341" y="152" width="298" height="54" rx="8"/>
+    <rect x="1" y="302" width="298" height="54" rx="8"/>
+    <rect x="341" y="302" width="298" height="54" rx="8"/>
+  </g>
+
+  <g font-size="24" class="fi" text-anchor="middle">
+    <text x="150" y="73">GTPase Era</text>
+    <text x="490" y="73">GTPase Era</text>
+    <text x="150" y="187">GTPase</text>
+    <text x="490" y="187">GTPase Era</text>
+    <text x="150" y="337">GTPase</text>
+    <text x="490" y="337">GTPase</text>
+  </g>
+  <g font-size="24" text-anchor="middle">
+    <text x="320" y="242" class="fb">scored different, <tspan class="num">23</tspan> times</text>
+    <text x="320" y="392" class="fa">scored the same</text>
+  </g>
+</svg>

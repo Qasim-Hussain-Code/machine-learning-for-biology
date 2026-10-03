@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 350" class="figsvg">
+  <!-- Figure 1.6: the ciprofloxacin rule as fixed before any modelling and as changed after reading the data, each kept
+       with its label and its score, and the reasons for the change that came from outside the score. -->
+  <rect x="0" y="0" width="640" height="112" rx="8" class="fp"/>
+  <rect x="0" y="0" width="7" height="112" class="fa"/>
+  <text x="28" y="40" font-size="24" class="fa">Fixed before any modelling</text>
+  <text x="28" y="82" font-size="24" class="fi">Any change at <tspan font-style="italic">gyrA</tspan> position 86</text>
+  <text x="616" y="82" font-size="28" text-anchor="end" class="fi num">99.67%</text>
+
+  <line x1="60" y1="112" x2="60" y2="166" class="sm" stroke-width="2"/>
+  <polygon points="53,166 60,180 67,166" class="fm"/>
+  <text x="84" y="153" font-size="22" class="fm">Found in the data: four alanine isolates, none resistant</text>
+
+  <rect x="0" y="180" width="640" height="170" rx="8" class="fp"/>
+  <rect x="0" y="180" width="7" height="170" class="fa2"/>
+  <text x="28" y="220" font-size="24" class="fa2">Changed after looking</text>
+  <text x="28" y="262" font-size="24" class="fi">The same rule without alanine</text>
+  <text x="616" y="262" font-size="28" text-anchor="end" class="fi num">99.77%</text>
+  <g font-size="22" class="fm">
+    <text x="28" y="302">On the strength of a nalidixic acid assay</text>
+    <text x="28" y="330">and a published result (Jesse and colleagues, 2006)</text>
+  </g>
+</svg>

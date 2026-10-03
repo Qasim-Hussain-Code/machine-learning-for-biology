@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 492" class="figsvg">
+  <!-- Figure 1.3: a sketch of isolates (dots) joined to their family (lines), split into train and test at random and by family. -->
+  <g class="fi" font-size="24">
+    <text x="0" y="24">Split at random</text>
+    <text x="0" y="276">Split by family</text>
+  </g>
+
+  <!-- panel 1: split at random; three of ten families cross the divide -->
+  <rect x="0" y="40" width="640" height="150" rx="10" class="fp"/>
+  <line x1="480" y1="40" x2="480" y2="190" class="sm" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <g class="fn sm" stroke-width="2.5">
+    <path d="M36 70 L90 90"/>
+    <path d="M150 64 L206 80 L176 120"/>
+    <path d="M266 68 L320 88"/>
+    <path d="M48 134 L102 148"/>
+    <path d="M236 144 L292 130"/>
+    <path d="M352 144 L372 106"/>
+    <path d="M566 138 L616 156"/>
+  </g>
+  <g class="fn sb" stroke-width="2.5">
+    <path d="M414 66 L540 80"/>
+    <path d="M432 124 L604 100"/>
+    <path d="M400 156 L528 144"/>
+  </g>
+  <g class="fi">
+    <circle cx="36" cy="70" r="7"/><circle cx="90" cy="90" r="7"/>
+    <circle cx="150" cy="64" r="7"/><circle cx="206" cy="80" r="7"/><circle cx="176" cy="120" r="7"/>
+    <circle cx="266" cy="68" r="7"/><circle cx="320" cy="88" r="7"/>
+    <circle cx="48" cy="134" r="7"/><circle cx="102" cy="148" r="7"/>
+    <circle cx="236" cy="144" r="7"/><circle cx="292" cy="130" r="7"/>
+    <circle cx="352" cy="144" r="7"/><circle cx="372" cy="106" r="7"/>
+    <circle cx="566" cy="138" r="7"/><circle cx="616" cy="156" r="7"/>
+    <circle cx="414" cy="66" r="7"/><circle cx="540" cy="80" r="7"/>
+    <circle cx="432" cy="124" r="7"/><circle cx="604" cy="100" r="7"/>
+    <circle cx="400" cy="156" r="7"/><circle cx="528" cy="144" r="7"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="240" y="180">train</text>
+    <text x="560" y="180">test</text>
+  </g>
+  <text x="0" y="224" font-size="22" class="fi"><tspan class="fb num" font-size="24">344</tspan> of <tspan class="num" font-size="24">1,128</tspan> families on both sides</text>
+
+  <!-- panel 2: split by family; the same ten families, each wholly on one side -->
+  <rect x="0" y="292" width="640" height="150" rx="10" class="fp"/>
+  <line x1="480" y1="292" x2="480" y2="442" class="sm" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <g class="fn sm" stroke-width="2.5">
+    <path d="M36 322 L90 342"/>
+    <path d="M150 316 L206 332 L176 372"/>
+    <path d="M266 320 L320 340"/>
+    <path d="M48 386 L102 400"/>
+    <path d="M236 396 L292 382"/>
+    <path d="M352 396 L372 358"/>
+    <path d="M566 390 L616 408"/>
+    <path d="M414 318 L462 332"/>
+    <path d="M530 336 L604 352"/>
+    <path d="M408 402 L452 384"/>
+  </g>
+  <g class="fi">
+    <circle cx="36" cy="322" r="7"/><circle cx="90" cy="342" r="7"/>
+    <circle cx="150" cy="316" r="7"/><circle cx="206" cy="332" r="7"/><circle cx="176" cy="372" r="7"/>
+    <circle cx="266" cy="320" r="7"/><circle cx="320" cy="340" r="7"/>
+    <circle cx="48" cy="386" r="7"/><circle cx="102" cy="400" r="7"/>
+    <circle cx="236" cy="396" r="7"/><circle cx="292" cy="382" r="7"/>
+    <circle cx="352" cy="396" r="7"/><circle cx="372" cy="358" r="7"/>
+    <circle cx="566" cy="390" r="7"/><circle cx="616" cy="408" r="7"/>
+    <circle cx="414" cy="318" r="7"/><circle cx="462" cy="332" r="7"/>
+    <circle cx="530" cy="336" r="7"/><circle cx="604" cy="352" r="7"/>
+    <circle cx="408" cy="402" r="7"/><circle cx="452" cy="384" r="7"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="240" y="432">train</text>
+    <text x="560" y="432">test</text>
+  </g>
+  <text x="0" y="476" font-size="22" class="fi"><tspan class="fa num" font-size="24">0</tspan> families on both sides</text>
+</svg>

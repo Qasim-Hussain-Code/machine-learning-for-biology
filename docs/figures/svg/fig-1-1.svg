@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 392" class="figsvg">
+  <!-- Figure 1.1: one schematic table of features, with its label column (supervised) and without it, sorted into groups (unsupervised). -->
+  <g class="fi" font-size="24">
+    <text x="0" y="26">Supervised learning</text>
+    <text x="344" y="26">Unsupervised learning</text>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="92" y="58">features</text>
+    <text x="232" y="58">label</text>
+    <text x="436" y="58">features</text>
+  </g>
+  <g class="fn sm" stroke-width="1.5">
+    <path d="M2 78 V70 H182 V78"/>
+    <path d="M206 78 V70 H258 V78"/>
+    <path d="M346 78 V70 H526 V78"/>
+  </g>
+
+  <!-- left table: rows 1 1 0 R, 1 1 1 R, 0 0 1 S, 1 0 1 R -->
+  <g class="fl">
+    <rect x="0" y="96" width="56" height="40" rx="5"/>
+    <rect x="64" y="96" width="56" height="40" rx="5"/>
+    <rect x="0" y="144" width="56" height="40" rx="5"/>
+    <rect x="64" y="144" width="56" height="40" rx="5"/>
+    <rect x="128" y="144" width="56" height="40" rx="5"/>
+    <rect x="128" y="192" width="56" height="40" rx="5"/>
+    <rect x="0" y="240" width="56" height="40" rx="5"/>
+    <rect x="128" y="240" width="56" height="40" rx="5"/>
+  </g>
+  <g class="fp sl" stroke-width="1.2">
+    <rect x="128.6" y="96.6" width="54.8" height="38.8" rx="5"/>
+    <rect x="0.6" y="192.6" width="54.8" height="38.8" rx="5"/>
+    <rect x="64.6" y="192.6" width="54.8" height="38.8" rx="5"/>
+    <rect x="64.6" y="240.6" width="54.8" height="38.8" rx="5"/>
+  </g>
+  <g class="fa">
+    <rect x="204" y="96" width="56" height="40" rx="5"/>
+    <rect x="204" y="144" width="56" height="40" rx="5"/>
+    <rect x="204" y="192" width="56" height="40" rx="5"/>
+    <rect x="204" y="240" width="56" height="40" rx="5"/>
+  </g>
+  <g class="fi" font-size="24" text-anchor="middle">
+    <text x="28" y="125" class="num">1</text><text x="92" y="125" class="num">1</text>
+    <text x="28" y="173" class="num">1</text><text x="92" y="173" class="num">1</text><text x="156" y="173" class="num">1</text>
+    <text x="156" y="221" class="num">1</text>
+    <text x="28" y="269" class="num">1</text><text x="156" y="269" class="num">1</text>
+  </g>
+  <g class="fm" font-size="24" text-anchor="middle">
+    <text x="156" y="125" class="num">0</text>
+    <text x="28" y="221" class="num">0</text><text x="92" y="221" class="num">0</text>
+    <text x="92" y="269" class="num">0</text>
+  </g>
+  <g class="fbg" font-size="24" text-anchor="middle">
+    <text x="232" y="125">R</text>
+    <text x="232" y="173">R</text>
+    <text x="232" y="221">S</text>
+    <text x="232" y="269">R</text>
+  </g>
+
+  <!-- right table: the same rows, no label, sorted into two groups -->
+  <g class="fn sa" stroke-width="2">
+    <rect x="334" y="86" width="204" height="108" rx="10"/>
+    <rect x="334" y="210" width="204" height="108" rx="10"/>
+  </g>
+  <g class="fl">
+    <rect x="344" y="96" width="56" height="40" rx="5"/>
+    <rect x="408" y="96" width="56" height="40" rx="5"/>
+    <rect x="344" y="144" width="56" height="40" rx="5"/>
+    <rect x="408" y="144" width="56" height="40" rx="5"/>
+    <rect x="472" y="144" width="56" height="40" rx="5"/>
+    <rect x="472" y="220" width="56" height="40" rx="5"/>
+    <rect x="344" y="268" width="56" height="40" rx="5"/>
+    <rect x="472" y="268" width="56" height="40" rx="5"/>
+  </g>
+  <g class="fp sl" stroke-width="1.2">
+    <rect x="472.6" y="96.6" width="54.8" height="38.8" rx="5"/>
+    <rect x="344.6" y="220.6" width="54.8" height="38.8" rx="5"/>
+    <rect x="408.6" y="220.6" width="54.8" height="38.8" rx="5"/>
+    <rect x="408.6" y="268.6" width="54.8" height="38.8" rx="5"/>
+  </g>
+  <g class="fi" font-size="24" text-anchor="middle">
+    <text x="372" y="125" class="num">1</text><text x="436" y="125" class="num">1</text>
+    <text x="372" y="173" class="num">1</text><text x="436" y="173" class="num">1</text><text x="500" y="173" class="num">1</text>
+    <text x="500" y="249" class="num">1</text>
+    <text x="372" y="297" class="num">1</text><text x="500" y="297" class="num">1</text>
+  </g>
+  <g class="fm" font-size="24" text-anchor="middle">
+    <text x="500" y="125" class="num">0</text>
+    <text x="372" y="249" class="num">0</text><text x="436" y="249" class="num">0</text>
+    <text x="436" y="297" class="num">0</text>
+  </g>
+
+  <g class="fm" font-size="22">
+    <text x="0" y="354">Answers given:</text>
+    <text x="0" y="382">learn to predict them</text>
+    <text x="344" y="354">No answers:</text>
+    <text x="344" y="382">find the groups</text>
+  </g>
+</svg>

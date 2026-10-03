@@ -1,0 +1,390 @@
+<!doctype html><html lang="en-GB" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Is a gene a fact or a call? · Machine Learning for Biology</title>
+<meta name="description" content="Machine Learning for Biology, a book by Qasim Hussain.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="assets/book.css">
+<script>(function(){var r=document.documentElement;try{var s=localStorage.getItem('mlb-theme');if(s)r.dataset.theme=s;}catch(e){}})();</script>
+</head><body class="lay-sidebar hs-smallcaps justify">
+<a class="skip" href="#main">Skip to the text</a>
+<header class="topbar"><a class="tb-title" href="index.html">Machine Learning for Biology</a>
+<div class="tb-right"><a class="tb-ed" href="machine-learning-for-biology.pdf" aria-label="Download the print edition, PDF (2 MB)" title="Download the print edition, PDF (2 MB)">PDF</a><a class="tb-ed" href="machine-learning-for-biology.epub" download aria-label="Download the e-book edition, EPUB (0 MB)" title="Download the e-book edition, EPUB (0 MB)">EPUB</a><button class="modebtn" type="button" aria-label="Switch to light mode">Light<span class="wide"> mode</span></button></div></header>
+<div class="frame"><nav class="toc" aria-label="Contents"><details class="tocd" open><summary class="toch">Contents</summary><ol><li><a href="preface.html">Preface</a></li><li><a href="prologue.html">Prologue</a></li><li class="part">Part I · Learning from labels</li><li><a href="chapter-1.html"><span class="n">1</span> Predicting antibiotic resistance from a genome<span class="m">Logistic regression</span></a></li><li><a href="chapter-2.html"><span class="n">2</span> What does a cell show to the immune system?<span class="m">Decision tree</span></a></li><li class="on"><a href="chapter-3.html" aria-current="page"><span class="n">3</span> Is a gene a fact or a call?<span class="m">Random forest</span></a><ol class="secs"><li><a href="#where-genes-come-from"><span class="sn">3.1</span>Where genes come from</a></li><li><a href="#why-a-random-forest"><span class="sn">3.2</span>Why a random forest</a></li><li><a href="#what-the-two-tools-actually-do"><span class="sn">3.3</span>What the two tools actually do</a></li><li><a href="#the-rules"><span class="sn">3.4</span>The rules</a></li><li><a href="#seventy-two-rows"><span class="sn">3.5</span>Seventy-two rows</a></li><li><a href="#two-failures-that-exited-cleanly"><span class="sn">3.6</span>Two failures that exited cleanly</a></li><li><a href="#half-the-names"><span class="sn">3.7</span>Half the names</a></li><li><a href="#a-model-that-reads-nothing"><span class="sn">3.8</span>A model that reads nothing</a></li><li><a href="#what-the-forest-was-reading"><span class="sn">3.9</span>What the forest was reading</a></li><li><a href="#what-this-chapter-got-wrong"><span class="sn">3.10</span>What this chapter got wrong</a></li><li><a href="#fact-or-call"><span class="sn">3.11</span>Fact or call</a></li></ol></li><li><a href="chapter-4.html"><span class="n">4</span> What happens to the patients who are still alive?<span class="m">Gradient boosting</span></a></li><li><a href="chapter-5.html"><span class="n">5</span> Gut bacteria and cardiovascular risk<span class="m">Logistic regression (support vector machine planned)</span></a></li><li><a href="chapter-6.html"><span class="n">6</span> Neoantigen immunogenicity for cancer vaccine design<span class="m">Neural network</span></a></li><li class="part">Part II · Learning without labels</li><li><a href="chapter-7.html"><span class="n">7</span> Immune cell subtype discovery from single-cell RNA-seq<span class="m">k-means</span></a></li><li><a href="epilogue.html">Epilogue</a></li></ol><p class="tohome"><a href="index.html">Title page and contents</a></p></details></nav><main class="col" id="main"><header class="opener op-smallcaps"><p class="op-kicker">Chapter 3 · Part I · Learning from labels</p>
+<h1 class="op-title">Is a gene a fact or a call?</h1><p class="op-model">Model: Random forest</p>
+<p class="op-question">When two standard tools read the same bacterial genome and disagree about a gene, can that disagreement be predicted from the DNA alone?</p></header><section class="summary"><p class="sk">Summary</p><p>Bakta and Prokka were run on the same 25 bacterial genomes, one from each of 25 species, and they almost never disagreed about where genes are. Only 72 of 87,960 Bakta gene calls had no matching Prokka call, because both tools find genes with the same underlying program. They disagreed far more about what the genes are: of 50,210 genes that both tools named, 51.7% received different names. A random forest predicted those naming disagreements with a Matthews correlation coefficient (MCC) of 0.303 on five held-out genomes, but its signal came from what each tool found in its reference databases, and with only DNA features it scored 0.142 on the same genomes and 0.070 in cross-validation on the twenty training genomes.</p></section><div class="bodywrap"><p>In 2000, a team sequenced <em>Campylobacter jejuni</em> and reported 1,654 genes. In 2007, a team that included two of the original authors went back to the same genome and reported fewer. There was no new strain and no new sequencing. The same 1,641,481 letters were read again, gene by gene, by curators. The DNA did not change. The count did (Figure 3.1).</p>
+<p>Somebody printed a microarray with 1,731 spots on it, one for every gene first identified in the genome: real glass, real DNA, an experiment you could run. By the time the genome paper was published, 77 of those spots stood for genes that were no longer in the annotation. The count had been revised down to 1,654, and the array had been built from the longer list. The 77 spots stayed on the glass, and the gene lists in the analysis software flagged each one as a &ldquo;not annotated gene&rdquo;. Seven years later the count went to 1,643. From 1,731 to 1,654 to 1,643 is eighty-eight fewer genes in the list.</p>
+<figure class="fig" id="fig-3-1"><svg role="img" aria-label="Three horizontal bars on an axis of genes counted, drawn from zero. The first, microarray spots, one per gene in the first list, reaches 1,731. The second, genes in the genome paper, 2000, reaches 1,654, and the rest of its length up to 1,731 is left open and marked 77 fewer. The third, genes after the same genome was read again, 2007, reaches 1,643, with its open end marked 88 fewer. Under the axis: genes counted in the same 1,641,481 letters." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" class="figsvg">
+  <!-- Figure 3.1: the same Campylobacter jejuni genome counted three times, on a 0 to 1,731 gene axis
+       (480 units for 1,731 genes). The open part of each later bar is what had been withdrawn from the first count. -->
+  <g font-size="22" class="fi">
+    <text x="0" y="24">Microarray spots, one per gene in the first list</text>
+    <text x="0" y="112">Genes in the genome paper, 2000</text>
+    <text x="0" y="200">Genes after the same genome was read again, 2007</text>
+  </g>
+  <g class="fa">
+    <rect x="0" y="36" width="480" height="34"/>
+    <rect x="0" y="124" width="458.65" height="34"/>
+    <rect x="0" y="212" width="455.6" height="34"/>
+  </g>
+  <g class="fn sm" stroke-width="1.5" stroke-dasharray="4 3">
+    <rect x="459.4" y="124.75" width="19.85" height="32.5"/>
+    <rect x="456.35" y="212.75" width="22.9" height="32.5"/>
+  </g>
+  <g class="fbg" font-size="24" text-anchor="end">
+    <text x="468" y="61" class="num">1,731</text>
+    <text x="446" y="149" class="num">1,654</text>
+    <text x="443" y="237" class="num">1,643</text>
+  </g>
+  <g class="fm" font-size="22">
+    <text x="492" y="149"><tspan class="num fi" font-size="24">77</tspan> fewer</text>
+    <text x="492" y="237"><tspan class="num fi" font-size="24">88</tspan> fewer</text>
+  </g>
+  <g class="sm" stroke-width="1.2">
+    <line x1="0" y1="272" x2="480" y2="272"/>
+    <line x1="0" y1="272" x2="0" y2="281"/><line x1="138.65" y1="272" x2="138.65" y2="281"/>
+    <line x1="277.3" y1="272" x2="277.3" y2="281"/><line x1="415.94" y1="272" x2="415.94" y2="281"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="7" y="306" class="num">0</text><text x="138.65" y="306" class="num">500</text>
+    <text x="277.3" y="306" class="num">1,000</text><text x="415.94" y="306" class="num">1,500</text>
+  </g>
+  <text x="0" y="342" font-size="22" class="fm">Genes counted in the same <tspan class="num fi">1,641,481</tspan> letters</text>
+</svg>
+<figcaption><b>Figure 3.1</b> One <i>Campylobacter jejuni</i> genome of 1,641,481 letters, counted three times, with each bar drawn from zero: 1,731 spots on a microarray built from the first gene list, one for every gene in it, then 1,654 genes in the genome paper of 2000 and 1,643 in 2007. The open end of each later bar marks how far the count had fallen from the first, 77 by the time of the paper and eighty-eight by 2007.</figcaption></figure>
+
+<p>The same thing still happens every day. Bakta and Prokka are two standard annotation tools, both widely used. Give them the same bacterial genome and, at some places, one says there is a gene here and the other says there is nothing here. Same DNA, the same letters in the same order, read twice. Neither program is broken.</p>
+<p>This chapter asks whether that disagreement can be predicted from the sequence alone. It does not ask whether a gene is really there. Nothing in this project can tell you that. The answer being predicted, which machine learning calls the label, was produced by software, so a model trained on it learns the annotator rather than the organism. That is the harder thing about this chapter, and it is the point.</p>
+<h2 id="where-genes-come-from"><span class="secno">3.1</span> Where genes come from</h2>
+<p>Start with what a gene caller is looking for. A protein-coding gene begins with a start codon, runs in groups of three letters and ends at a stop codon. The stretch in between is an open reading frame. Find every open reading frame and you have found every possible gene. That is the easy part, and on its own it is useless.</p>
+<p>Three of the sixty-four possible codons mean stop. <em>Campylobacter</em> is AT-rich: most of its letters are A or T, and the three stop codons are written mostly in those two letters, so in its genome they are common. Read a random stretch and you hit a stop every thirteen codons or so. So the genome is full of short open reading frames that mean nothing: millions of letters, six reading frames, stops everywhere. The real genes average 316 codons. They are the long ones. But length alone will not separate them, because a short gene is still a gene and a long accident is still an accident.</p>
+<p>So the caller weighs other things. Does the codon usage inside this frame look like the codon usage of known genes in this organism? Is there a ribosome-binding site sitting just upstream? Does the protein it would produce resemble a protein somebody has already described? Each of these is evidence. None of them is proof. And each needs a cut-off: how similar is similar enough, how long is long enough, how close the binding site has to sit. Nobody finds those numbers in the genome. They are chosen by the people who write the software, and two programs can choose them differently. That is the whole of this chapter.</p>
+<p>Of the <em>C. jejuni</em> genome, 94.3% codes for protein. The other 5.7% is about 93,564 letters, and it is neither empty nor junk. Some of it is genes that make RNA instead of protein: the ribosomal RNA the cell builds its ribosomes from, and the transfer RNAs that carry amino acids into place. Some of it is control: promoters where transcription starts, ribosome-binding sites, terminators that say stop here. Besides ribosomal and transfer RNA, this genome has four annotated RNAs. Four, in 1.6 million letters. That is a count of how many anybody has written down, not a claim that only four exist.</p>
+<p>Which brings me to the word intergenic. It sounds like a description of a place, between the genes. What it actually means is that nothing has been annotated here. It is a residual, defined by absence, and the absence is in the record rather than in the molecule. Move a gene boundary and the intergenic space moves. Withdraw a gene and the intergenic space grows. When two annotation tools disagree about a region, one of them calls it a gene and the other calls it intergenic, and neither is looking at anything the other cannot see.</p>
+<h2 id="why-a-random-forest"><span class="secno">3.2</span> Why a random forest</h2>
+<p>The model in this chapter is a random forest: many decision trees, each a chain of yes-or-no questions learned from a different slice of the data, voting on the answer.</p>
+<p>Chapter 2 was built on a single tree, and the best moment in it was reading the thing. I could print the questions it had chosen, and it had found a real binding rule that nobody told it about. A forest gives that up. Three hundred trees will score higher than one, and I will not be able to read any of them. So this chapter has a harder label and a model I cannot read.</p>
+<h2 id="what-the-two-tools-actually-do"><span class="secno">3.3</span> What the two tools actually do</h2>
+<p>Bakta and Prokka do not disagree the way I assumed. I assumed two independent gene callers, each trained differently, each finding its own answer. That is not what is happening underneath.</p>
+<p>Prokka calls genes with a program called Prodigal. Bakta calls genes with a program called Pyrodigal, and Pyrodigal is a rewrite of Prodigal in a different language: same model, same scoring, faster code, some bugs fixed. The two are close enough to the same caller that most of a genome will come out identical either way.</p>
+<p>The disagreement comes from two decisions about what to look for. Bakta adds a search for very short proteins, under thirty amino acids, which Prodigal was never built to find. Bakta also calls pseudogenes: genes broken by a stop codon or a frameshift, still recognisable, still worth recording. Prokka mostly does not. So a real disagreement between them will rarely look like two tools reading the same DNA and reaching different conclusions. It will look like one tool asking a question the other tool never asked.</p>
+<p>That changes what the forest should find. If the two callers were independent, disagreement might trace to something subtle in the sequence, a signal one caller catches and the other misses. If they mostly share a caller, disagreement should trace to something blunter. Length, mostly, because short proteins are what one tool looks for and the other does not. If the forest&rsquo;s top feature, the column of data it leans on most, is not length, I have misunderstood something.</p>
+<h2 id="the-rules"><span class="secno">3.4</span> The rules</h2>
+<p>The rule for what counts as a disagreement was written into the code before the label was built. Each protein-coding gene Bakta called is one row. If anything Prokka annotated on the same strand overlaps that call, by as little as a single base, the call counts as matched. If nothing does, Bakta made a call there and Prokka did not, and the row is a disagreement.</p>
+<p>One base sounds loose, and it is meant to be. The two tools mostly agree on where a gene starts and stops, and when they do not, it is usually over the exact start codon: a difference of a few dozen letters, inside a call both tools clearly made. That is not a disagreement. Both tools found the gene. A rule that demanded a large overlap on both sides would turn some of those start-codon differences into missing genes. So the label asks only whether Prokka claimed the stretch at all. Whether the two calls share a start, and whether they share a stop, are recorded beside the label rather than mixed into it (Figure 3.2).</p>
+<p>Strand matters. DNA has two strands, and a gene can sit on either. Two genes on opposite strands can occupy the same letters and still be different genes, so only what Prokka annotated on the same strand is consulted. If the only call Prokka made at that place is on the other strand, the Bakta call counts as one Prokka did not make. The kind of annotation does not matter. If Prokka called a transfer RNA, or anything else that is not a protein-coding gene, on the same strand where Bakta called a protein-coding gene, Prokka did not leave the region empty. It made a different claim, not a missing one, and counting it as silence would put two unlike things in one label. Those calls count as matched, and there are 29 of them.</p>
+<p>One more decision was easy to get wrong. When both tools call the same gene but pick different start codons, which coordinates go in the table? Every row carries Bakta&rsquo;s, matched or not: where Bakta&rsquo;s call starts and stops, and how long it is. How much of it Prokka&rsquo;s call covers is kept as a separate count. So the length of every call in the table is the length Bakta chose, and a model that leans on length can learn that tool&rsquo;s habits instead of the sequence.</p>
+<p>The rule did not change once the label existed, and that matters more than it looks. A threshold chosen after seeing which one gives the better story is not a threshold. It is the story wearing a number.</p>
+<p>Later in the chapter the question moved from where genes are to what they are called, and that comparison needed a rule of its own. Comparing product names, the names each tool gives to the protein a gene makes, by exact string match is too strict. One tool writes 50S ribosomal protein L7/L12, and the other writes the same thing with a bracket on the end. Those are the same claim, and counting them as different would make the whole exercise meaningless. So names are normalised before comparison. Strip a trailing bracket. Strip a trailing gene symbol, because one tool often appends it and the other does not. Strip a leading hedge word: putative, probable, possible, predicted or conserved. Then ignore capitals and treat punctuation as a space. Under that rule, putative cytosol aminopeptidase and Cytosol aminopeptidase are the same name. The check on that rule was fixed before I ran it.</p>
+<div class="rules"><p class="rh">Rules for this chapter</p>
+<p><strong>Fixed before the label was built.</strong> Each protein-coding gene Bakta called is one row. It counts as matched if anything Prokka annotated on the same strand overlaps it by at least one base, whatever the kind of annotation; if nothing does, it is a call Prokka did not make. Prokka&rsquo;s annotations on the opposite strand are not consulted. Every row carries Bakta&rsquo;s coordinates. The overlap with Prokka&rsquo;s call, and whether the two calls share a start and a stop, are recorded beside the label, not in it.</p>
+<p><strong>Fixed before any model was fitted.</strong> Names are compared after stripping a trailing bracket, a trailing gene symbol and a leading hedge word such as putative, then ignoring capitals and treating punctuation as a space. The result is checked against the strings as written, ignoring only capitals, spacing and a final full stop, and against the loosest rule I was willing to defend, which also drops generic words and ignores word order. Both are checks, not alternatives to switch to.</p>
+<p><strong>Changed after looking.</strong> The gene-symbol strip first used each record&rsquo;s own symbol field. It now builds one list of symbols per pair, from both tools, and applies it to both sides. Identical raw strings can never be scored as a disagreement, and the pipeline checks this on every run. After a silent failure inside Prokka, the pipeline also records how many of each kind of annotation, such as genes or ribosomal RNAs, each tool produced, per genome.</p>
+</div>
+<figure class="fig" id="fig-3-2"><svg role="img" aria-label="A key shows Bakta's call of a protein-coding gene and Prokka's annotation, of any kind, as arrows in two colours. Three rows follow, each a Bakta arrow above a Prokka arrow. In the first, the Prokka arrow points the same way but starts later: matched, same strand, a different start, recorded beside the label. In the second, a short Prokka arrow pointing the same way begins where the Bakta arrow ends, with a dotted line through the base they share: matched, same strand, a transfer RNA sharing a single base. In the third, the Prokka arrow covers the same stretch but points the other way: a call Prokka did not make, because Prokka's only call here is on the other strand." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 438" class="figsvg">
+  <!-- Figure 3.2: the rule that built the label, as three cases. Each row is one Bakta protein-coding call (upper arrow)
+       and what Prokka annotated at the same place (lower arrow); an arrow points along the strand it sits on. -->
+  <polygon points="0,6 30,6 42,17 30,28 0,28" class="fa"/>
+  <polygon points="0,42 30,42 42,53 30,64 0,64" class="fa2"/>
+  <g font-size="22" class="fi">
+    <text x="56" y="25">Bakta's call of a protein-coding gene</text>
+    <text x="56" y="61">Prokka's annotation, of any kind</text>
+  </g>
+
+  <g class="sl" stroke-width="1.2">
+    <line x1="0" y1="86" x2="640" y2="86"/>
+    <line x1="0" y1="206" x2="640" y2="206"/>
+    <line x1="0" y1="326" x2="640" y2="326"/>
+  </g>
+
+  <!-- 1: same strand, a different start -->
+  <polygon points="0,106 272,106 290,118 272,130 0,130" class="fa"/>
+  <polygon points="56,144 272,144 290,156 272,168 56,168" class="fa2"/>
+  <!-- 2: same strand, a transfer RNA sharing a single base at the end of the call -->
+  <polygon points="0,226 232,226 250,238 232,250 0,250" class="fa"/>
+  <polygon points="244,264 282,264 300,276 282,288 244,288" class="fa2"/>
+  <line x1="247" y1="220" x2="247" y2="294" class="sm" stroke-width="1.2" stroke-dasharray="3 3"/>
+  <!-- 3: Prokka's only call here is on the other strand -->
+  <polygon points="0,346 272,346 290,358 272,370 0,370" class="fa"/>
+  <polygon points="290,384 18,384 0,396 18,408 290,408" class="fa2"/>
+
+  <g font-size="24" class="fi">
+    <text x="320" y="126">Matched</text>
+    <text x="320" y="246">Matched</text>
+    <text x="320" y="366">A call Prokka did not make</text>
+  </g>
+  <g font-size="22" class="fm">
+    <text x="320" y="156">Same strand, a different start,</text>
+    <text x="320" y="182">recorded beside the label</text>
+    <text x="320" y="276">Same strand, a transfer RNA</text>
+    <text x="320" y="302">sharing a single base</text>
+    <text x="320" y="396">Prokka's only call here is</text>
+    <text x="320" y="422">on the other strand</text>
+  </g>
+</svg>
+<figcaption><b>Figure 3.2</b> The rule that built the label, in three cases, with each arrow pointing along the strand it sits on. A Bakta call that shares even one base with anything Prokka annotated on the same strand is matched, whether Prokka’s call starts somewhere else or is another kind of annotation, such as a transfer RNA; a Bakta call with nothing from Prokka on its strand is a call Prokka did not make, whatever Prokka called on the other strand.</figcaption></figure>
+
+<h2 id="seventy-two-rows"><span class="secno">3.5</span> Seventy-two rows</h2>
+<p>The pipeline ran on 25 bacterial genomes, one from each of 25 species spread across eight phyla. The <em>Campylobacter jejuni</em> genome this chapter opened with is one of them. Across all 25, Bakta made 87,960 gene calls, and 72 of them have no matching call from Prokka. That is a disagreement rate of 0.0008, eight in ten thousand. Of the 87,888 calls both tools made, 87,788 have identical start and stop coordinates, to the base.</p>
+<p>The reason was knowable before I downloaded a single genome. With Prokka on Prodigal and Bakta on a rewrite of Prodigal, asking whether Bakta and Prokka disagree about where genes are is mostly asking whether Prodigal agrees with itself. It does. Leave aside the 43 calls Bakta made with its search for very short proteins, and in the other 87,917, there are 38 divergences, which is 0.04%. I expected a small signal. I got 72 rows.</p>
+<p>How much overlap the rule demanded hardly mattered. When 87,788 of the 87,888 matched calls are identical to the base, they would match under any threshold, and the 72 with nothing overlapping them would match under none. A stricter threshold could have changed the label for at most the remaining hundred of the 87,960 calls. I could not have known that in advance, and choosing the threshold afterwards, once I could see which one flattered the result, would not have been a choice at all. A rule that turns out not to bind is still worth fixing beforehand.</p>
+<p>The reasoning about length held. Asked to pick out the 72 coordinate disagreements, the forest leaned on the length Bakta gave each call more than on anything else. Of those 72, 34 come from one module. After the main gene caller finishes, Bakta runs a second search for short open reading frames, under thirty amino acids. Prokka has nothing equivalent. Bakta made 43 such calls across the whole panel, and 34 of them are disagreements. Nearly every short protein Bakta finds, Prokka misses, because it never looked. Prodigal&rsquo;s default minimum gene length is 90 base pairs, which is thirty codons. The shortest disagreement here is 45 base pairs.</p>
+<p>Now the part that is actually biology. Look at what those short proteins are. They are Type I toxin-antitoxin system Ibs family toxins, and leader peptides from the tryptophan and histidine operons. These are real, well described and functionally important. The first is a toxin whose antitoxin is an RNA that stops it being translated. The second is a short peptide whose ribosome stalls or does not, and in stalling decides whether the operon behind it gets transcribed. This is textbook regulatory biology, and exactly the class a dedicated short open reading frame finder is built to catch.</p>
+<p>So the disagreement is real, and it points at something real. But the label is not what I said it was. At the start of this chapter, I described two tools reading the same DNA and reaching different conclusions. What the data holds is one tool running an extra module. That is a fact about software architecture, and the biology is downstream of it.</p>
+<h2 id="two-failures-that-exited-cleanly"><span class="secno">3.6</span> Two failures that exited cleanly</h2>
+<p>One more thing had gone wrong before I could trust any of this. Prokka found zero ribosomal RNAs in all 25 genomes. It reported that, and exited successfully.</p>
+<p>Every bacterial genome has ribosomal RNA. It is not optional, and a genome with none is not a genome. The tool did not crash, did not warn and did not return an error code. It printed Found 0 rRNAs and finished. I found it while the annotation was still being set up, before any label had been built.</p>
+<p>Here is the chain. Prokka does not find ribosomal RNA itself. It calls a program called barrnap. Barrnap does not do it either: it calls nhmmer. The nhmmer binary in that environment had been compiled against one version of a maths library, and the environment shipped a different version. So nhmmer failed at runtime, every time. Barrnap got nothing back and reported nothing. Prokka reported what barrnap told it. Three programs deep, and nobody raised a hand (Figure 3.3).</p>
+<figure class="fig" id="fig-3-3"><svg role="img" aria-label="Three boxes in a column: Prokka at the top, barrnap in the middle and nhmmer at the bottom, outlined as the point of failure. Between each pair, a solid arrow labelled calls points down and a dashed arrow labelled nothing points back up. Beside nhmmer: fails at runtime, every time, compiled against one version of a maths library; another was shipped. Beside Prokka: prints Found 0 rRNAs and exits with code 0." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" class="figsvg">
+  <!-- Figure 3.3: how the ribosomal RNA search failed without an error. Each program calls the one below it; what came
+       back up was nothing, and the program at the top reported zero and exited with code 0. -->
+  <g class="fp sl" stroke-width="1.5">
+    <rect x="1" y="4" width="238" height="64" rx="8"/>
+    <rect x="1" y="148" width="238" height="64" rx="8"/>
+  </g>
+  <rect x="1" y="292" width="238" height="64" rx="8" class="fp sb" stroke-width="2"/>
+  <g font-size="26" class="fi" text-anchor="middle">
+    <text x="120" y="45">Prokka</text>
+    <text x="120" y="189">barrnap</text>
+    <text x="120" y="333">nhmmer</text>
+  </g>
+
+  <g class="sm" stroke-width="2">
+    <line x1="72" y1="68" x2="72" y2="134"/>
+    <line x1="72" y1="212" x2="72" y2="278"/>
+  </g>
+  <g class="sm" stroke-width="2" stroke-dasharray="5 4">
+    <line x1="168" y1="148" x2="168" y2="82"/>
+    <line x1="168" y1="292" x2="168" y2="226"/>
+  </g>
+  <g class="fm">
+    <polygon points="65,134 72,148 79,134"/>
+    <polygon points="65,278 72,292 79,278"/>
+    <polygon points="161,82 168,68 175,82"/>
+    <polygon points="161,226 168,212 175,226"/>
+  </g>
+  <g font-size="22" class="fm">
+    <text x="84" y="116">calls</text>
+    <text x="84" y="260">calls</text>
+    <text x="180" y="116">nothing</text>
+    <text x="180" y="260">nothing</text>
+  </g>
+
+  <g font-size="24" class="fi">
+    <text x="272" y="28">Prints <tspan class="num" font-size="22">Found 0 rRNAs</tspan></text>
+    <text x="272" y="62">and exits with code <tspan class="num">0</tspan></text>
+  </g>
+  <text x="272" y="314" font-size="24" class="fb">Fails at runtime, every time</text>
+  <g font-size="22" class="fm">
+    <text x="272" y="342">compiled against one version of a</text>
+    <text x="272" y="368">maths library; another was shipped</text>
+  </g>
+</svg>
+<figcaption><b>Figure 3.3</b> How Prokka reported zero ribosomal RNAs and exited with code 0. Prokka calls barrnap and barrnap calls nhmmer; nhmmer had been compiled against a different version of a maths library from the one shipped and failed every time, and no error came back up the chain.</figcaption></figure>
+
+<p>Think about what that would have done to the comparison. A disagreement is a region one tool called and the other did not. If Prokka finds no ribosomal RNA anywhere, then every ribosomal RNA Bakta calls looks like one. Not a real one: a missing shared library, which would have gone into the data as biology.</p>
+<p>I caught it because the count was zero rather than low. Zero is impossible, and impossible is visible. The first complete Prokka run, 87,901 gene calls and no ribosomal RNA, was thrown away and redone. The rule I took from it is that a program exiting successfully is not evidence that it did its job. The pipeline now records how many of each kind of annotation each tool produced, per genome. I do not expect this bug again. I expect the next one to exit zero as well.</p>
+<p>With the coordinates settled, the same regions could be asked a different question. At 87,859 places, both tools called a protein-coding gene, almost always with the same start and stop. Do they agree on what those genes are? The second failure belongs to that question, and this time the code was mine.</p>
+<p>My code decided that GTPase Era and GTPase Era were different names, 23 times (Figure 3.4). Same string: same letters, same spaces, same capitals, scored as a disagreement between two tools that had written exactly the same thing. The way it happened is common.</p>
+<p>The gene-symbol strip is where it broke. To strip a trailing gene symbol, you need to know what the gene symbols are, and my first version read each record&rsquo;s own symbol field and stripped that. Bakta fills that field on 19,216 of these regions. Prokka fills it on 48,201. So for thousands of pairs the strip fired on one side and not the other. Two identical strings went in, one came out shortened, and the comparison said different.</p>
+<figure class="fig" id="fig-3-4"><svg role="img" aria-label="Two columns of boxes. At the top, both read GTPase Era, the left column headed symbol field filled and the right symbol field empty. Under the first rule, each record strips the symbol in its own field: the left becomes GTPase, the right stays GTPase Era, and the pair is scored different, 23 times. Under the fixed rule, one symbol list from both tools, used on both: both read GTPase, and the pair is scored the same." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 404" class="figsvg">
+  <!-- Figure 3.4: one name, written identically by both tools, where only one record has its gene symbol field filled.
+       The first rule stripped each record's own symbol, so only one side was shortened; the fixed rule builds one
+       symbol list per pair from both tools and strips it from both sides. -->
+  <g font-size="22" class="fm" text-anchor="middle">
+    <text x="150" y="24">symbol field filled</text>
+    <text x="490" y="24">symbol field empty</text>
+  </g>
+  <g class="fp sl" stroke-width="1.5">
+    <rect x="1" y="38" width="298" height="54" rx="8"/>
+    <rect x="341" y="38" width="298" height="54" rx="8"/>
+  </g>
+
+  <g font-size="22" class="fi">
+    <text x="0" y="138">First rule: each record strips the symbol in its own field</text>
+    <text x="0" y="288">Fixed rule: one symbol list from both tools, used on both</text>
+  </g>
+  <g class="fn sm" stroke-width="1.5">
+    <rect x="1" y="152" width="298" height="54" rx="8"/>
+    <rect x="341" y="152" width="298" height="54" rx="8"/>
+    <rect x="1" y="302" width="298" height="54" rx="8"/>
+    <rect x="341" y="302" width="298" height="54" rx="8"/>
+  </g>
+
+  <g font-size="24" class="fi" text-anchor="middle">
+    <text x="150" y="73">GTPase Era</text>
+    <text x="490" y="73">GTPase Era</text>
+    <text x="150" y="187">GTPase</text>
+    <text x="490" y="187">GTPase Era</text>
+    <text x="150" y="337">GTPase</text>
+    <text x="490" y="337">GTPase</text>
+  </g>
+  <g font-size="24" text-anchor="middle">
+    <text x="320" y="242" class="fb">scored different, <tspan class="num">23</tspan> times</text>
+    <text x="320" y="392" class="fa">scored the same</text>
+  </g>
+</svg>
+<figcaption><b>Figure 3.4</b> One name, GTPase Era, written the same way by both tools, where only one record has its gene-symbol field filled. Stripping each record’s own symbol shortened one side only, and the pair was scored as different 23 times; one symbol list, built from both tools and used on both sides, shortens both, and the names are scored the same.</figcaption></figure>
+
+<p>The fix is one line of thinking rather than one line of code. Build the symbol list once per pair, from both tools, and apply it to both sides. Listing 3.1 is the comparison as it now stands.</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 3.1</b> Comparing two product names with one symbol list built for the pair, from <code>scripts/lib_names.py</code>.</span></summary><pre tabindex="0"><code class="language-python">def compare(product_bakta, gene_bakta, product_prokka, gene_prokka, level=&quot;primary&quot;):
+    &quot;&quot;&quot;-&gt; (agree, normalised_bakta, normalised_prokka).&quot;&quot;&quot;
+    symbols = (frozenset() if level == &quot;strict&quot;
+               else symbol_candidates(product_bakta, gene_bakta,
+                                      product_prokka, gene_prokka))
+    a = normalise(product_bakta, symbols, level)
+    b = normalise(product_prokka, symbols, level)
+    return a == b, a, b
+</code></pre></details>
+<p>Then I added an assertion, because a fix you cannot verify is a hope. If two raw strings are identical, they can never be scored as a disagreement. The pipeline checks this on every run and refuses to write the file if it fails. Across all 87,859 regions both tools called, 29,808 pairs have identical raw strings. There are zero violations.</p>
+<p>Note the direction of the bug. It inflated the disagreement rate. It made my result more interesting.</p>
+<h2 id="half-the-names"><span class="secno">3.7</span> Half the names</h2>
+<p>Bakta and Prokka read the same 50,210 genes. They give different names to 25,977 of them. That is 51.7%, about half. These are the same regions, with both tools confident enough to write a name, and the names do not match.</p>
+<p>The obvious objection is that this is a formatting artefact, and the check fixed in advance answers it. Compare the strings as written, ignoring only capitals, spacing and a full stop at the end, and 56.0% disagree. Compare them under my normalisation rule and 51.7% disagree. Compare them under the loosest rule I was willing to defend, dropping generic words and ignoring word order, and 50.6% disagree. Five points across the entire range from strictest to loosest. The disagreement is not punctuation.</p>
+<p>A second objection is worth answering. Bakta has a naming style that guarantees a mismatch. When it can only match a structural domain, it writes a name ending in domain-containing protein. Prokka does not do that, so those are near-certain disagreements. There are 4,210 such regions, and 284 more where Bakta calls the protein uncharacterised and adds only the name of its open reading frame, which Prokka never matches either. Together that is 4,494 regions, 9% of the set, disagreeing almost every time. Take them out and the remaining 45,716 regions disagree 47.0% of the time.</p>
+<p>The shorthand disagrees too. Where both tools assign a gene symbol, the symbols differ 41.1% of the time. Where both assign an enzyme number, the numbers differ 16.7% of the time.</p>
+<p>Pangenome analyses group genes by name. Functional enrichment counts categories built from names. Resistance reports quote a gene product. Every one of those inherits whichever tool was run. None of this is a claim that either tool is wrong. I have no way to know which name is right, and neither does anybody working from annotation output alone.</p>
+<h2 id="a-model-that-reads-nothing"><span class="secno">3.8</span> A model that reads nothing</h2>
+<p>Can the naming disagreement be predicted? The first answer was a warning. A model that reads nothing won.</p>
+<p>It uses no sequence, no database matches and no information at all. It always guesses the same answer, and it got the highest score in the whole comparison. Here is how a model that knows nothing beats models that know something. Half the regions in this data are disagreements between the two tools, so a model that always says yes, this is a disagreement, is right about half the time by luck alone. The score it won on was F1, which Chapter 2 also used. It rewards catching every true case, and it gives no credit for a region correctly left alone. Say yes to everything and you catch every true case. So the model that never looks at the data scored 0.664 on F1, higher than any model that actually learned something.</p>
+<aside class="note">
+<p><strong>Matthews correlation coefficient (MCC).</strong> A score that punishes false alarms as much as it rewards true catches, and that also gives credit for a region correctly left alone. Zero means no better than a coin flip. One means perfect.</p>
+</aside>
+<p>This had happened before, in Chapters 1 and 2. A score means nothing until you know what a model that knows nothing would score.</p>
+<p>So the honest comparison uses a different measure, MCC, with every model and baseline scored on the same regions, all from five genomes held out of training. The model that always says yes scores 0.000, as any model that gives the same answer every time must. A model that looks only at how long the protein is scores 0.028. One that looks only at whether Prokka found a similar protein in UniProtKB, a large public protein database, scores 0.141. It stands in for the baseline I had planned, which asked whether either tool had left the protein unnamed: every region here was named by both tools, so that question has the same answer everywhere. A single decision tree scores 0.261. The random forest scores 0.303. Gradient boosting, a more advanced technique, scores 0.288. The most elaborate model on that list did not win; the random forest did (Figure 3.5).</p>
+<figure class="fig" id="fig-3-5"><svg role="img" aria-label="Horizontal bars of MCC on an axis from 0 to 0.4, every model scored on the same held-out regions. Three baselines in grey: the model that always says yes, a hairline at zero marked 0.000, with the note but 0.664 with F1, the highest F1 of all; protein length only, 0.028; and Prokka's UniProtKB match only, 0.141. Three models in colour: one decision tree, 0.261; random forest, 0.303; and gradient boosting, 0.288." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 530" class="figsvg">
+  <!-- Figure 3.5: MCC of three baselines (muted) and three models (accent), all scored on the same held-out regions,
+       on a 0 to 0.4 axis (1,300 units per unit of MCC). The model that always says yes has no bar: it scores 0.000. -->
+  <g font-size="22" class="fi">
+    <text x="0" y="24">The model that always says yes</text>
+    <text x="0" y="98">Protein length only</text>
+    <text x="0" y="172">Prokka's UniProtKB match only</text>
+    <text x="0" y="246">One decision tree</text>
+    <text x="0" y="320">Random forest</text>
+    <text x="0" y="394">Gradient boosting</text>
+  </g>
+  <g class="fm">
+    <rect x="0" y="36" width="2" height="26"/>
+    <rect x="0" y="110" width="36.4" height="26"/>
+    <rect x="0" y="184" width="183.3" height="26"/>
+  </g>
+  <g class="fa">
+    <rect x="0" y="258" width="339.3" height="26"/>
+    <rect x="0" y="332" width="393.9" height="26"/>
+    <rect x="0" y="406" width="374.4" height="26"/>
+  </g>
+  <g font-size="24" class="fi">
+    <text x="10" y="57" class="num">0.000</text>
+    <text x="45.4" y="131" class="num">0.028</text>
+    <text x="192.3" y="205" class="num">0.141</text>
+    <text x="348.3" y="279" class="num">0.261</text>
+    <text x="402.9" y="353" class="num">0.303</text>
+    <text x="383.4" y="427" class="num">0.288</text>
+  </g>
+  <text x="104" y="57" font-size="22" class="fm">but <tspan class="num fi">0.664</tspan> with F1, the highest F1 of all</text>
+
+  <g class="sm" stroke-width="1.2">
+    <line x1="0" y1="450" x2="520" y2="450"/>
+    <line x1="0" y1="450" x2="0" y2="459"/><line x1="130" y1="450" x2="130" y2="459"/><line x1="260" y1="450" x2="260" y2="459"/>
+    <line x1="390" y1="450" x2="390" y2="459"/><line x1="520" y1="450" x2="520" y2="459"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="7" y="486" class="num">0</text><text x="130" y="486" class="num">0.1</text>
+    <text x="260" y="486" class="num">0.2</text><text x="390" y="486" class="num">0.3</text>
+    <text x="520" y="486" class="num">0.4</text>
+  </g>
+  <text x="0" y="520" font-size="22" class="fm">MCC, every model scored on the same held-out regions</text>
+</svg>
+<figcaption><b>Figure 3.5</b> MCC for the three baselines, in grey, and the three models, all scored on the same held-out regions, on an axis from zero. The model that always says yes scores 0.000, although its F1 of 0.664 was the highest of all; the random forest is highest at 0.303.</figcaption></figure>
+
+<p>What does the random forest get right and wrong? It was tested on 12,283 regions it had never seen, and it flagged 6,105 of them as disagreements. 3,965 of those flags were correct. 2,140 were not. So for every three regions it flags, one is a false alarm, against one in two if it flagged at random. That is real signal. It is nowhere near reliable enough to trust on its own.</p>
+<h2 id="what-the-forest-was-reading"><span class="secno">3.9</span> What the forest was reading</h2>
+<p>I ran the same random forest three times, with the same folds, the same random seed and the same way of choosing its settings. Only the columns it was allowed to see changed (Figure 3.6). The seventeen columns that describe the raw DNA include the GC content of the gene and of the hundred letters on either side, how repetitive the sequence is, how often stop codons fall in its emptiest reading frame, and three properties of the whole genome. Thirty-five come from the gene caller: the boundaries it chose, the reading frame and strand they imply, and everything computed from the protein those boundaries translate into, such as its length and the share of each amino acid. The other nine describe what each tool found in its databases.</p>
+<p>With all 61 features, the forest scores 0.303 on MCC on the five held-out genomes. Take away everything that comes from the gene caller itself, leaving 26 features, and it scores 0.259. It barely moved. Take away the database features too, leaving the 17 that describe the raw DNA, and it scores 0.142.</p>
+<p>That last number is generous. A test on five genomes is small, and its score moves with which five genomes happen to be in it. The steadier measure comes from the twenty training genomes: split them into five groups, hold each group out in turn while the forest trains on the other four, and average the five scores. On that measure the DNA-only forest scores 0.070, which is close to nothing. That is the honest answer to the question this chapter actually asked. Does the DNA sequence predict disagreement? Barely.</p>
+<figure class="fig" id="fig-3-6"><svg role="img" aria-label="A key separates MCC on the five held-out genomes from MCC in cross-validation on the twenty training genomes. Three bars of held-out MCC on an axis from 0 to 0.4: all 61 features, 0.303; gene-caller features taken away, 26 left, 0.259; database features taken away too, 17 left, all raw DNA, 0.142. Beneath the last, a shorter bar in the second colour reads 0.070, the cross-validation score for DNA alone." xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 416" class="figsvg">
+  <!-- Figure 3.6: the same random forest given fewer columns, on a 0 to 0.4 MCC axis (1,300 units per unit of MCC).
+       Accent bars are scored on the five held-out genomes; the second-accent bar is the DNA-only forest in
+       cross-validation on the twenty training genomes. -->
+  <rect x="0" y="6" width="28" height="22" class="fa"/>
+  <rect x="0" y="42" width="28" height="22" class="fa2"/>
+  <g font-size="22" class="fm">
+    <text x="40" y="25">MCC on the five held-out genomes</text>
+    <text x="40" y="61">MCC in cross-validation on the twenty training genomes</text>
+  </g>
+
+  <g font-size="22" class="fi">
+    <text x="1" y="118">All <tspan class="num">61</tspan> features</text>
+    <text x="0" y="198">Gene-caller features taken away: <tspan class="num">26</tspan> left</text>
+    <text x="0" y="278">Database features taken away too: <tspan class="num">17</tspan> left, all raw DNA</text>
+  </g>
+  <g class="fa">
+    <rect x="0" y="130" width="393.9" height="26"/>
+    <rect x="0" y="210" width="336.7" height="26"/>
+    <rect x="0" y="290" width="184.6" height="26"/>
+  </g>
+  <rect x="0" y="322" width="91" height="26" class="fa2"/>
+  <g font-size="24" class="fi">
+    <text x="402.9" y="151" class="num">0.303</text>
+    <text x="345.7" y="231" class="num">0.259</text>
+    <text x="193.6" y="311" class="num">0.142</text>
+    <text x="100" y="343" class="num">0.070</text>
+  </g>
+
+  <g class="sm" stroke-width="1.2">
+    <line x1="0" y1="370" x2="520" y2="370"/>
+    <line x1="0" y1="370" x2="0" y2="379"/><line x1="130" y1="370" x2="130" y2="379"/>
+    <line x1="260" y1="370" x2="260" y2="379"/><line x1="390" y1="370" x2="390" y2="379"/>
+    <line x1="520" y1="370" x2="520" y2="379"/>
+  </g>
+  <g class="fm" font-size="22" text-anchor="middle">
+    <text x="7" y="406" class="num">0</text><text x="130" y="406" class="num">0.1</text>
+    <text x="260" y="406" class="num">0.2</text><text x="390" y="406" class="num">0.3</text>
+    <text x="520" y="406" class="num">0.4</text>
+  </g>
+</svg>
+<figcaption><b>Figure 3.6</b> The same random forest given fewer columns, scored on the five held-out genomes, on an axis from zero: 0.303 with all 61 features, 0.259 with the gene-caller features taken away and 0.142 with the database features taken away too, leaving the 17 that describe the raw DNA. The second bar for DNA alone, 0.070, is the same forest in cross-validation on the twenty training genomes.</figcaption></figure>
+
+<p>So which features had been carrying the score? There is a way to check this honestly. Shuffle one column, so that it no longer lines up with the right answers, and score again to see how much was lost. Do it on genomes the model never saw, so the answer is about generalisation. Then add up the damage by category. Shuffling the nine features that describe database cross-references cost 0.165. Shuffling the thirty-five features that describe the gene call itself cost 0.019. Shuffling the seventeen features that describe raw DNA cost negative 0.001. Negative means that shuffling those columns made the model slightly better. That is what noise looks like when you measure it honestly.</p>
+<p>The top three features were how many cross-references Bakta attached, whether Prokka assigned an enzyme number, and whether Prokka matched a protein motif.</p>
+<p>The obvious reading is that the names disagree where the evidence runs thin: neither database knows the protein well, each tool guesses, and the guesses differ. I tested that rather than assuming it, and it holds only in part. It fits the 4,494 regions where Bakta fell back on a domain name or an open reading frame name, which disagree almost every time. Among the other 45,716, it holds on Prokka&rsquo;s side. Where Prokka assigned no enzyme number, the names disagree 54.0% of the time, against 42.1% where it did.</p>
+<p>On Bakta&rsquo;s side it runs the other way. Where Bakta attached two cross-references or fewer, as it does about nine times in ten, the names disagree 44.2% of the time. Where it attached three, they disagree 79.8% of the time, and at four or more, 62.8%. A third cross-reference is usually an enzyme number or a match in a more specialised database, and it comes with a more specific name from Bakta, which is then more likely to differ from Prokka&rsquo;s more general one. That is why the number of cross-references Bakta attached is the forest&rsquo;s strongest feature: on Bakta&rsquo;s side, more evidence goes with more disagreement. Either way, what the model learned is a fact about two reference databases and how each tool names from them. It has nothing to do with the DNA sequence itself.</p>
+<p>One decision made this visible. Every feature was given flags at creation saying where it came from, and the check reads those flags automatically rather than from a list I typed by hand. Listing 3.2 shows how the database features were declared.</p>
+<details class="lst"><summary class="lst-cap"><span class="lt"><b>Listing 3.2</b> The features declared as database-derived, each with two flags (derived from the gene caller, derived from a database) and a description, from <code>scripts/14_content_features.py</code>. One of the ten, <code>bakta_has_pfam</code>, never varied among the regions both tools named and was left out, which leaves the nine the model used.</span></summary><pre tabindex="0"><code class="language-python">        &quot;bakta_has_uniref&quot;: (
+            0, 1, &quot;Bakta's Dbxref contains a UniRef cluster&quot;),
+        &quot;bakta_has_pfam&quot;: (
+            0, 1, &quot;Bakta's Dbxref contains a Pfam accession&quot;),
+        &quot;bakta_has_ec&quot;: (
+            0, 1, &quot;Bakta's Dbxref contains an EC number&quot;),
+        &quot;bakta_has_is&quot;: (
+            0, 1, &quot;Bakta's Dbxref contains an ISFinder insertion-sequence match&quot;),
+        &quot;bakta_n_dbxref&quot;: (
+            0, 1, &quot;number of cross-references Bakta attached&quot;),
+        &quot;prokka_has_similarity_hit&quot;: (
+            0, 1, &quot;Prokka's inference cites a UniProtKB protein similarity&quot;),
+        &quot;prokka_has_protein_motif&quot;: (
+            0, 1, &quot;Prokka's inference cites an HMM protein motif&quot;),
+        &quot;prokka_has_cog&quot;: (
+            0, 1, &quot;Prokka assigned a COG&quot;),
+        &quot;prokka_has_ec&quot;: (
+            0, 1, &quot;Prokka assigned an EC number&quot;),
+        &quot;mobile_neighbours_5kb&quot;: (
+            0, 1, f&quot;Bakta CDS within {MOBILE_WINDOW} bp carrying an ISFinder &quot;
+                  &quot;match; the only mobile-element context derivable from what &quot;
+                  &quot;is already annotated&quot;),
+</code></pre></details>
+<p>Without those flags, the 26 features left once the gene-caller columns were gone would have passed for features of the DNA, and the score of 0.259 would have looked like real biology. It was not.</p>
+<h2 id="what-this-chapter-got-wrong"><span class="secno">3.10</span> What this chapter got wrong</h2>
+<p>I built an experiment around a disagreement that turned out to be 72 rows. The reason was sitting in the tools&rsquo; own documentation, and I had not read it first.</p>
+<p>Bakta ran on db-light, the smaller of its two reference databases, because the full one would not fit on my machine. I predicted that the smaller database would leave Bakta naming fewer genes than Prokka. I had it backwards. Of the 87,859 regions both tools called, Bakta left 12.5% with a placeholder such as hypothetical protein instead of a name. Prokka left 40.2%.</p>
+<p>My own code counted identical text as a disagreement, 23 separate times, and that mistake made my result look better than it was.</p>
+<p>One feature in the first experiment, on where genes are, never changed value across its 87,960 rows, so it could tell the model nothing. Nobody caught it until the second experiment, on names.</p>
+<h2 id="fact-or-call"><span class="secno">3.11</span> Fact or call</h2>
+<p>The chapter asked whether a gene is a fact or a call, and the answer split in two.</p>
+<p>Where does a gene start? Bakta called 87,960 genes, and the two tools disagreed about only 72 of them. That looks remarkable until you see why. Both tools find genes with the same underlying program, so this was never two independent opinions. It was one opinion, copied. Where a bacterial gene starts looks like a fact, but it is one decision, made once and inherited by everyone who has used the same software since. A fact that spread is still a copy.</p>
+<p>What is that gene, once you have found it? Here the story turns over. For the same 50,210 genes, both tools were confident enough to give a name, and the names disagree 51.7% of the time. Without one tool&rsquo;s habit of naming genes after a generic protein domain, or after an open reading frame alone, it is still 47.0%. A model can predict which genes will disagree, but not from the DNA. Give the model only the features that describe the DNA, and the score falls to 0.142 on the five held-out genomes, and to 0.070 in cross-validation on the twenty training genomes. What carries the prediction is what each tool found in its reference library. Where Prokka found less, the names disagree more often. Where Bakta found more, it gives a more specific name, which is more likely to differ from Prokka&rsquo;s. The DNA never changed. The books each tool checked did.</p>
+<p>So a gene is both. Where it starts is a call so old and so widely copied that it behaves like a fact. What it does is a call made fresh, by whoever has the newer library, and it disagrees over half the time. Every number from the two experiments, right and wrong, is in the repository. Chapter 4 asks a harder kind of question, not whether something happens but when, and some of its patients are still alive when the study ends.</p>
+<p class="prov">This chapter is rewritten from the posts for Days 26 to 39 of the series.</p></div><section class="endm"><div class="run"><p class="eh">Run it</p>
+<p><span class="lbl">Repository</span> <a href="https://github.com/Qasim-Hussain-Code/bakta_prokka_disagreement_prediction">bakta_prokka_disagreement_prediction</a></p>
+<p><span class="lbl">Commit</span> <a href="https://github.com/Qasim-Hussain-Code/bakta_prokka_disagreement_prediction/tree/4f797c3fa09d"><code>4f797c3fa09d</code></a></p></div>
+<div class="cite"><p class="eh">Cite this chapter</p><p>Hussain, Q. (2026). Is a gene a fact or a call? In <i>Machine Learning for Biology</i>, chapter 3.</p></div></section><nav class="pn" aria-label="Previous and next"><a class="prev" href="chapter-2.html"><span>Previous</span>Chapter 2: What does a cell show to the immune system?</a><a class="next" href="chapter-4.html"><span>Next</span>Chapter 4: What happens to the patients who are still alive?</a></nav></main></div>
+<script src="assets/book.js"></script></body></html>

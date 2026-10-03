@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 352" class="figsvg">
+  <!-- Figure 7.3: the protocol in order. Steps 2 to 5 run while the answer key is locked away; it opens once, at the end. -->
+  <rect x="1" y="54" width="638" height="246" rx="8" class="fp sa" stroke-width="2"/>
+  <line x1="26" y1="24" x2="26" y2="333" class="sm" stroke-width="2"/>
+  <g class="fi">
+    <circle cx="26" cy="24" r="7"/>
+    <circle cx="26" cy="127" r="7"/>
+    <circle cx="26" cy="173" r="7"/>
+    <circle cx="26" cy="219" r="7"/>
+    <circle cx="26" cy="265" r="7"/>
+  </g>
+  <circle cx="26" cy="333" r="7" class="fa"/>
+
+  <text x="52" y="88" font-size="22" class="fa">Answer key locked away</text>
+  <g font-size="22" class="fi">
+    <text x="52" y="31">Settings and pass-or-fail tests committed</text>
+    <text x="52" y="134">Labels moved to a separate file; cells recoded and shuffled</text>
+    <text x="52" y="180">Gene expression only, squeezed to <tspan class="num" font-size="24">50</tspan> axes</text>
+    <text x="52" y="226">The silhouette picks k, from <tspan class="num" font-size="24">2</tspan> to <tspan class="num" font-size="24">20</tspan></text>
+    <text x="52" y="272">Groups named from marker genes and committed</text>
+    <text x="52" y="340">The key opens once, and the groups are scored</text>
+  </g>
+</svg>
