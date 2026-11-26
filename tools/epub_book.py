@@ -3,13 +3,12 @@ EPUB 3 with an EPUB 2 table of contents for older readers. The text is rendered 
 editions (tools/build_book.py, tools/print_book.py); code listings are shown in full, and the reader's own settings
 decide the type size. The build checks that every file is well-formed XML and that every reference resolves.
 usage: python tools/epub_book.py"""
-import datetime, html, io, os, re, sys, uuid, zipfile
+import datetime, html, os, re, sys, uuid, zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_book as B  # noqa: E402
 import print_book as P  # noqa: E402
 from lxml import etree, html as lhtml  # noqa: E402
-from PIL import Image, ImageDraw, ImageFont  # noqa: E402
 
 EPUB = os.path.join(B.OUT, 'machine-learning-for-biology.epub')
 BOOK_ID = 'urn:uuid:' + str(uuid.uuid5(uuid.NAMESPACE_URL, 'https://github.com/Qasim-Hussain-Code/machine-learning-for-biology'))
@@ -118,28 +117,9 @@ def figure_bytes(name):
 
 
 def cover_image():
-    """A plain cover in the book's colours: the title, the accent rule and the author, set in STIX."""
-    W, H = 1600, 2400
-    im = Image.new('RGB', (W, H), '#0E1626')
-    d = ImageDraw.Draw(im)
-    try:
-        import matplotlib
-        fonts = os.path.join(os.path.dirname(matplotlib.__file__), 'mpl-data', 'fonts', 'ttf')
-        title_font = ImageFont.truetype(os.path.join(fonts, 'STIXGeneralBol.ttf'), 150)
-        author_font = ImageFont.truetype(os.path.join(fonts, 'STIXGeneral.ttf'), 58)
-    except Exception:
-        title_font = ImageFont.truetype('georgiab.ttf', 140)
-        author_font = ImageFont.truetype('georgia.ttf', 56)
-    x, y = 150, 820
-    for line in ('Machine Learning', 'for Biology'):
-        d.text((x, y), line, font=title_font, fill='#ECEEF0')
-        y += 190
-    d.rectangle([x, y + 60, x + 260, y + 66], fill='#7DD3FC')
-    spaced = '  '.join(' '.join(word) for word in B.AUTHOR.upper().split())
-    d.text((x, y + 130), spaced, font=author_font, fill='#C5CEDB')
-    buf = io.BytesIO()
-    im.save(buf, 'JPEG', quality=90)
-    return buf.getvalue()
+    """The cover, kept as figures/cover.jpg (1600 x 2400): the same design as the book's cover on the author's website.
+    It is a finished image, not drawn here, so a new title or author needs a new image."""
+    return open(os.path.join(B.ROOT, 'figures', 'cover.jpg'), 'rb').read()
 
 
 def build():
