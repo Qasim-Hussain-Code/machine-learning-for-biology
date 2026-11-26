@@ -267,7 +267,8 @@ def editions():
     for ext, label, what in (('pdf', 'PDF', 'the print edition, PDF'), ('epub', 'EPUB', 'the e-book edition, EPUB')):
         path = os.path.join(OUT, f'machine-learning-for-biology.{ext}')
         if os.path.exists(path):
-            size = f'{os.path.getsize(path) / 1e6:.0f} MB'
+            mb = os.path.getsize(path) / 1e6
+            size = f'{mb:.1f} MB' if mb < 10 else f'{mb:.0f} MB'   # a 0.5 MB file must not read "0 MB" or "1 MB"
             dl = ' download' if ext == 'epub' else ''
             links.append(f'<a class="tb-ed" href="machine-learning-for-biology.{ext}"{dl} '
                          f'aria-label="Download {what} ({size})" title="Download {what} ({size})">{label}</a>')
