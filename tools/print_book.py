@@ -1,7 +1,8 @@
 """Build the print edition of Machine Learning for Biology as a PDF.
 The whole book is written into one HTML document (docs/print.html, styled by tools/theme/print.css) and printed by
 headless Chrome (tools/print_pdf.mjs). It is printed twice: the first pass finds the page on which each part begins,
-and the second fills those page numbers into the contents.
+and the second fills those page numbers into the contents. The cover (figures/cover.jpg) is then put in front as an
+uncounted sheet, so the PDF has one page more than the highest printed page number.
 usage: python tools/print_book.py        -> docs/machine-learning-for-biology.pdf"""
 import html, os, re, shutil, subprocess, sys
 
@@ -12,6 +13,8 @@ from pypdf import PdfReader  # noqa: E402
 HTML_NAME = 'print.html'
 PDF_PATH = os.path.join(B.OUT, 'machine-learning-for-biology.pdf')
 PRINTER = os.path.join(B.ROOT, 'tools', 'print_pdf.mjs')
+COVER = os.path.join(B.ROOT, 'figures', 'cover.jpg')
+COVER_GROUND = '#0E1626'   # the cover's navy, painted beside the image to the edges of the sheet
 
 
 def piece(stem, page):
@@ -114,9 +117,43 @@ def link_targets(pdf):
     return found, named, len(reader.pages)
 
 
+def add_cover(writer):
+    """Put the cover (figures/cover.jpg, the image the EPUB uses) in front of the printed pages as a sheet of its own.
+    The sheet is painted in the cover's navy to its edges and the image is fitted by height and centred, so no white
+    shows. The cover is not counted: the page labels call it "Cover" and the title page stays page 1, as printed."""
+    from PIL import Image
+    from pypdf import PageObject
+    from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject, NumberObject, StreamObject
+    box = writer.pages[0].mediabox
+    W, H = float(box.width), float(box.height)
+    with Image.open(COVER) as im:
+        iw, ih = im.size
+        if im.format != 'JPEG' or im.mode != 'RGB':
+            sys.exit(f'{COVER} must be an RGB JPEG to go into the PDF as it is')
+    image = StreamObject()
+    image._data = open(COVER, 'rb').read()
+    image.update({NameObject('/Type'): NameObject('/XObject'), NameObject('/Subtype'): NameObject('/Image'),
+                  NameObject('/Width'): NumberObject(iw), NameObject('/Height'): NumberObject(ih),
+                  NameObject('/ColorSpace'): NameObject('/DeviceRGB'), NameObject('/BitsPerComponent'): NumberObject(8),
+                  NameObject('/Filter'): NameObject('/DCTDecode')})
+    w = H * iw / ih
+    r, g, b = (int(COVER_GROUND[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    # the cover repeats the title page that follows, so it is marked as an artifact for the tagged structure
+    draw = DecodedStreamObject()
+    draw.set_data((f'/Artifact BMC q {r:.4f} {g:.4f} {b:.4f} rg 0 0 {W:.2f} {H:.2f} re f Q '
+                   f'q {w:.2f} 0 0 {H:.2f} {(W - w) / 2:.2f} 0 cm /Cover Do Q EMC').encode('ascii'))
+    page = PageObject.create_blank_page(width=W, height=H)
+    page[NameObject('/Resources')] = DictionaryObject(
+        {NameObject('/XObject'): DictionaryObject({NameObject('/Cover'): writer._add_object(image)})})
+    page[NameObject('/Contents')] = writer._add_object(draw)
+    writer.insert_page(page, 0)
+    writer.set_page_label(0, 0, prefix='Cover')
+    writer.set_page_label(1, len(writer.pages) - 1, style='/D', start=1)
+
+
 def finish(pdf, html_text):
     """Chrome drops the space where a heading wraps when it builds the bookmarks, so put the headings' own text back,
-    and record the title and author in the document information."""
+    record the title and author in the document information, and put the cover in front."""
     from pypdf import PdfWriter
     from pypdf.generic import NameObject, TextStringObject
     squash = lambda s: re.sub(r'\s+', '', s)
@@ -141,6 +178,7 @@ def finish(pdf, html_text):
     if outlines is not None and '/First' in outlines.get_object():
         walk(outlines.get_object()['/First'])
     writer.add_metadata({'/Title': B.BOOK, '/Author': B.AUTHOR, '/Subject': 'Machine learning for biology, in seven chapters'})
+    add_cover(writer)
     tmp = pdf + '.tmp'
     with open(tmp, 'wb') as f:
         writer.write(f)
@@ -173,4 +211,5 @@ if __name__ == '__main__':
     if moved:
         sys.exit(f'page numbers moved between passes: {moved}')
     fixed = finish(PDF_PATH, open(target, encoding='utf-8').read())
-    print(f'{PDF_PATH}: {total2} pages, {fixed} bookmark titles repaired; starts: ' + ', '.join(f'{p} {n}' for p, n in pages.items()))
+    print(f'{PDF_PATH}: the cover and {total2} pages, {fixed} bookmark titles repaired; starts: '
+          + ', '.join(f'{p} {n}' for p, n in pages.items()))
