@@ -39,6 +39,10 @@ a{color:var(--accent)}
    stands alone above the notice, since a column of text beside it would be too narrow to read */
 .tp-cover{float:right;width:180px;margin:0 0 18px 28px}
 .tp-cover img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+/* one cover for each mode: the navy one in the dark, its white counterpart in the light */
+.tp-cover .c-light{display:none}
+:root[data-theme="light"] .tp-cover .c-dark{display:none}
+:root[data-theme="light"] .tp-cover .c-light{display:block}
 .titlepage::after{content:"";display:table;clear:both}
 @media (max-width:600px){.tp-cover{float:none;width:160px;margin:18px 0 28px}}
 .tp-beta b{font-weight:600}

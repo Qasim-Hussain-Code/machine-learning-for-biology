@@ -308,7 +308,7 @@ def title_page():
     main = f'''<section class="titlepage"><h1 class="tp-title">{BOOK}</h1>
 <figure class="epigraph"><blockquote>{EPIGRAPH}</blockquote><figcaption><span class="who">{EPI_WHO}</span>
 <span class="role">{EPI_ROLE}</span><span class="src">{EPI_SRC}</span></figcaption></figure>
-<p class="tp-author">{AUTHOR}</p><figure class="tp-cover"><img src="assets/cover-web.webp" width="400" height="600" alt="The cover of {BOOK} by {AUTHOR}."></figure><p class="tp-beta"><b>Beta edition.</b> This book will be revised, corrected and extended continuously for some time yet. Suggestions for its improvement are most welcome, through an <a href="https://github.com/Qasim-Hussain-Code/machine-learning-for-biology/issues">issue on its repository</a> or a message on <a href="https://www.linkedin.com/in/qasim--hussain">LinkedIn</a>.</p></section><hr class="tpbreak">
+<p class="tp-author">{AUTHOR}</p><figure class="tp-cover"><img class="c-dark" src="assets/cover-web.webp" width="400" height="600" alt="The cover of {BOOK} by {AUTHOR}."><img class="c-light" src="assets/cover-web-light.webp" width="400" height="600" loading="lazy" alt="The cover of {BOOK} by {AUTHOR}."></figure><p class="tp-beta"><b>Beta edition.</b> This book will be revised, corrected and extended continuously for some time yet. Suggestions for its improvement are most welcome, through an <a href="https://github.com/Qasim-Hussain-Code/machine-learning-for-biology/issues">issue on its repository</a> or a message on <a href="https://www.linkedin.com/in/qasim--hussain">LinkedIn</a>.</p></section><hr class="tpbreak">
 <section class="contents"><h2 class="ch">Contents</h2><ol>{"".join(contents)}</ol></section>'''
     return shell(BOOK, 'index', main, None, (first, 'Begin reading'))
 
@@ -333,8 +333,9 @@ if __name__ == '__main__':
     copy_figures()
     for f in ('book.css', 'book.js'):
         shutil.copy(os.path.join(ROOT, 'tools', 'theme', f), os.path.join(OUT, 'assets', f))
-    # the cover on the title page (400 x 600, from figures/cover.jpg) and the card for link previews
-    for f in ('cover-web.webp', 'share-card.jpg'):
+    # the cover on the title page (400 x 600): design 62 on navy for the dark mode, from figures/cover.jpg, and its
+    # counterpart on white, design 61, for the light mode; and the card for link previews
+    for f in ('cover-web.webp', 'cover-web-light.webp', 'share-card.jpg'):
         shutil.copy(os.path.join(ROOT, 'figures', f), os.path.join(OUT, 'assets', f))
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(title_page())
     built = ['index']
