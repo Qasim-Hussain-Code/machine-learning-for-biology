@@ -2,7 +2,7 @@
 The whole book is written into one HTML document (docs/print.html, styled by tools/theme/print.css) and printed by
 headless Chrome (tools/print_pdf.mjs). It is printed twice: the first pass finds the page on which each part begins,
 and the second fills those page numbers into the contents. The cover (figures/cover.jpg) is then put in front as an
-uncounted sheet, so the PDF has one page more than the highest printed page number.
+uncounted sheet in place of a title page, so the PDF has one page more than the highest printed page number.
 usage: python tools/print_book.py        -> docs/machine-learning-for-biology.pdf"""
 import html, os, re, shutil, subprocess, sys
 
@@ -67,8 +67,10 @@ def document(pages=None):
         model = f'<span class="m">{html.escape(meta["model"])}</span>' if meta.get('model') else ''
         contents.append(f'<li><a href="#p-{page}">{num}<span class="t">{html.escape(meta.get("title", stem.title()))}</span>{pg(page)}{model}</a></li>')
         parts.append(text)
-    front = (f'<section class="titlepage" id="title"><h1>{B.BOOK}</h1><div class="rule"></div><p class="author">{B.AUTHOR}</p></section>'
-             f'<section class="epipage"><blockquote>{B.EPIGRAPH}</blockquote><p class="who">{B.EPI_WHO}</p>'
+    # No title page: the cover, put in front by finish(), shows the title and the author, and a title page after it
+    # only repeated them. A screen reader takes the book's name from the document information, which finish() writes
+    # and the PDF asks viewers to display.
+    front = (f'<section class="epipage"><blockquote>{B.EPIGRAPH}</blockquote><p class="who">{B.EPI_WHO}</p>'
              f'<p>{B.EPI_ROLE}</p><p>{B.EPI_SRC}</p></section>'
              f'<section class="contents-page"><h2>Contents</h2><ol>{"".join(contents)}</ol></section>')
     return f'''<!doctype html><html lang="en-GB"><head><meta charset="utf-8">
@@ -120,7 +122,7 @@ def link_targets(pdf):
 def add_cover(writer):
     """Put the cover (figures/cover.jpg, the image the EPUB uses) in front of the printed pages as a sheet of its own.
     The sheet is painted in the cover's navy to its edges and the image is fitted by height and centred, so no white
-    shows. The cover is not counted: the page labels call it "Cover" and the title page stays page 1, as printed."""
+    shows. The cover is not counted: the page labels call it "Cover" and the epigraph is page 1, as printed."""
     from PIL import Image
     from pypdf import PageObject
     from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject, NumberObject, StreamObject
@@ -138,7 +140,7 @@ def add_cover(writer):
                   NameObject('/Filter'): NameObject('/DCTDecode')})
     w = H * iw / ih
     r, g, b = (int(COVER_GROUND[i:i + 2], 16) / 255 for i in (1, 3, 5))
-    # the cover repeats the title page that follows, so it is marked as an artifact for the tagged structure
+    # the title reaches a screen reader through the document information, so the picture is marked as an artifact
     draw = DecodedStreamObject()
     draw.set_data((f'/Artifact BMC q {r:.4f} {g:.4f} {b:.4f} rg 0 0 {W:.2f} {H:.2f} re f Q '
                    f'q {w:.2f} 0 0 {H:.2f} {(W - w) / 2:.2f} 0 cm /Cover Do Q EMC').encode('ascii'))
