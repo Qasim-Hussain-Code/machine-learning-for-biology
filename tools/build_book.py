@@ -8,6 +8,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'docs')
 BOOK = 'Machine Learning for Biology'
 AUTHOR = 'Qasim Hussain'
+SITE = 'https://qasim-hussain-code.github.io/machine-learning-for-biology/'   # the published address of docs/
 EPIGRAPH = 'We’ve essentially found a way to make sand think. It’s miraculous.'
 EPI_WHO = 'Demis Hassabis'
 EPI_ROLE = ('Nobel Laureate · Co-Founder and Chair, Google DeepMind · Chief Scientist, Alphabet · '
@@ -197,10 +198,24 @@ def shell(title, current, main, prev=None, nxt=None, secs=None):
         pn = '<nav class="pn" aria-label="Previous and next">' + \
              (f'<a class="prev" href="{prev[0]}.html"><span>Previous</span>{html.escape(prev[1])}</a>' if prev else '<span></span>') + \
              (f'<a class="next" href="{nxt[0]}.html"><span>Next</span>{html.escape(nxt[1])}</a>' if nxt else '') + '</nav>'
+    # The card a link preview shows (assets/share-card.jpg, 1200 x 630, made from the cover), and the page's own
+    # address, so that a post of any page carries the cover and search engines see one address per page.
+    url = SITE + ('' if current == 'index' else f'{current}.html')
     return f'''<!doctype html><html lang="en-GB" data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title>
 <meta name="description" content="{BOOK}, a book by {AUTHOR}.">
+<link rel="canonical" href="{url}">
+<meta property="og:type" content="{'book' if current == 'index' else 'article'}">
+<meta property="og:site_name" content="{BOOK}">
+<meta property="og:title" content="{html.escape(title)}">
+<meta property="og:description" content="{BOOK}, a book by {AUTHOR}. Beta edition.">
+<meta property="og:url" content="{url}">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="{SITE}assets/share-card.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The cover of {BOOK} by {AUTHOR}, beside its title.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="{FONTS}" rel="stylesheet"><link rel="stylesheet" href="assets/book.css">
 <script>(function(){{var r=document.documentElement;try{{var s=localStorage.getItem('mlb-theme');if(s)r.dataset.theme=s;}}catch(e){{}}}})();</script>
@@ -293,7 +308,7 @@ def title_page():
     main = f'''<section class="titlepage"><h1 class="tp-title">{BOOK}</h1>
 <figure class="epigraph"><blockquote>{EPIGRAPH}</blockquote><figcaption><span class="who">{EPI_WHO}</span>
 <span class="role">{EPI_ROLE}</span><span class="src">{EPI_SRC}</span></figcaption></figure>
-<p class="tp-author">{AUTHOR}</p><p class="tp-beta"><b>Beta edition.</b> This book will be revised, corrected and extended continuously for some time yet. Suggestions for its improvement are most welcome, through an <a href="https://github.com/Qasim-Hussain-Code/machine-learning-for-biology/issues">issue on its repository</a> or a message on <a href="https://www.linkedin.com/in/qasim--hussain">LinkedIn</a>.</p></section><hr class="tpbreak">
+<p class="tp-author">{AUTHOR}</p><figure class="tp-cover"><img src="assets/cover-web.webp" width="400" height="600" alt="The cover of {BOOK} by {AUTHOR}."></figure><p class="tp-beta"><b>Beta edition.</b> This book will be revised, corrected and extended continuously for some time yet. Suggestions for its improvement are most welcome, through an <a href="https://github.com/Qasim-Hussain-Code/machine-learning-for-biology/issues">issue on its repository</a> or a message on <a href="https://www.linkedin.com/in/qasim--hussain">LinkedIn</a>.</p></section><hr class="tpbreak">
 <section class="contents"><h2 class="ch">Contents</h2><ol>{"".join(contents)}</ol></section>'''
     return shell(BOOK, 'index', main, None, (first, 'Begin reading'))
 
@@ -318,6 +333,9 @@ if __name__ == '__main__':
     copy_figures()
     for f in ('book.css', 'book.js'):
         shutil.copy(os.path.join(ROOT, 'tools', 'theme', f), os.path.join(OUT, 'assets', f))
+    # the cover on the title page (400 x 600, from figures/cover.jpg) and the card for link previews
+    for f in ('cover-web.webp', 'share-card.jpg'):
+        shutil.copy(os.path.join(ROOT, 'figures', f), os.path.join(OUT, 'assets', f))
     open(os.path.join(OUT, 'index.html'), 'w', encoding='utf-8').write(title_page())
     built = ['index']
     for i, (stem, page, _) in enumerate(ORDER):
