@@ -15,6 +15,18 @@ PDF_PATH = os.path.join(B.OUT, 'machine-learning-for-biology.pdf')
 PRINTER = os.path.join(B.ROOT, 'tools', 'print_pdf.mjs')
 COVER = os.path.join(B.ROOT, 'figures', 'cover.jpg')
 COVER_GROUND = '#0E1626'   # the cover's navy, painted beside the image to the edges of the sheet
+# The cover's lettering, measured in the picture's own pixels (1600 x 2400, design 62): each line's words, its tag,
+# its left and right edges, its baseline and its type size. The same words are laid over the picture as invisible
+# text, so that programs which read a PDF's first page (Google Scholar, screen readers) find the title and the author
+# there. COVER_SHA guards the measurements: a new cover needs them taken again.
+COVER_SHA = 'a57452443595e3ec'
+COVER_WORDS = (('Machine Learning', '/H1', 162, 1438, 332, 160),
+               ('for Biology', '/H1', 162, 914, 504, 160),
+               ('Qasim Hussain', '/P', 163, 728, 674, 66))
+# Times-Roman advance widths, in thousandths of the type size, for the letters above: each invisible line is stretched
+# to the width of the lettering it lies over
+TIMES = {' ': 250, 'B': 667, 'H': 722, 'L': 611, 'M': 889, 'Q': 722, 'a': 444, 'c': 444, 'e': 444, 'f': 333, 'g': 500,
+         'h': 500, 'i': 278, 'l': 278, 'm': 778, 'n': 500, 'o': 500, 'r': 333, 's': 389, 'u': 500, 'y': 500}
 
 
 def piece(stem, page):
@@ -68,8 +80,8 @@ def document(pages=None):
         contents.append(f'<li><a href="#p-{page}">{num}<span class="t">{html.escape(meta.get("title", stem.title()))}</span>{pg(page)}{model}</a></li>')
         parts.append(text)
     # No title page: the cover, put in front by finish(), shows the title and the author, and a title page after it
-    # only repeated them. A screen reader takes the book's name from the document information, which finish() writes
-    # and the PDF asks viewers to display.
+    # only repeated them. The cover also carries both as invisible, tagged text (see add_cover), which is what Google
+    # Scholar and a screen reader read; the document information, which finish() writes, names them as well.
     front = (f'<section class="epipage"><blockquote>{B.EPIGRAPH}</blockquote><p class="who">{B.EPI_WHO}</p>'
              f'<p>{B.EPI_ROLE}</p><p>{B.EPI_SRC}</p></section>'
              f'<section class="contents-page"><h2>Contents</h2><ol>{"".join(contents)}</ol></section>')
@@ -122,10 +134,18 @@ def link_targets(pdf):
 def add_cover(writer):
     """Put the cover (figures/cover.jpg, the image the EPUB uses) in front of the printed pages as a sheet of its own.
     The sheet is painted in the cover's navy to its edges and the image is fitted by height and centred, so no white
-    shows. The cover is not counted: the page labels call it "Cover" and the epigraph is page 1, as printed."""
+    shows. The cover is not counted: the page labels call it "Cover" and the epigraph is page 1, as printed.
+
+    The title and the author are lettered into the picture, where no program can read them, so the same words are
+    laid over the lettering as invisible text (rendering mode 3, the way a scanned page carries its recognised text)
+    and tagged as a heading and a paragraph. Google Scholar takes a document's title and authors from the text of its
+    first page, and a screen reader now finds them on the cover too."""
+    import hashlib
     from PIL import Image
     from pypdf import PageObject
     from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject, NumberObject, StreamObject
+    if hashlib.sha256(open(COVER, 'rb').read()).hexdigest()[:16] != COVER_SHA:
+        sys.exit(f'{COVER} has changed: measure its lettering again and update COVER_WORDS and COVER_SHA')
     box = writer.pages[0].mediabox
     W, H = float(box.width), float(box.height)
     with Image.open(COVER) as im:
@@ -139,18 +159,57 @@ def add_cover(writer):
                   NameObject('/ColorSpace'): NameObject('/DeviceRGB'), NameObject('/BitsPerComponent'): NumberObject(8),
                   NameObject('/Filter'): NameObject('/DCTDecode')})
     w = H * iw / ih
+    x0, s = (W - w) / 2, H / ih   # where the picture starts on the sheet, and points per pixel of the picture
     r, g, b = (int(COVER_GROUND[i:i + 2], 16) / 255 for i in (1, 3, 5))
-    # the title reaches a screen reader through the document information, so the picture is marked as an artifact
+    # the picture and the navy beside it are decoration, so they are marked as an artifact; the words are not
+    ops = [f'/Artifact BMC q {r:.4f} {g:.4f} {b:.4f} rg 0 0 {W:.2f} {H:.2f} re f Q '
+           f'q {w:.2f} 0 0 {H:.2f} {x0:.2f} 0 cm /Cover Do Q EMC']
+    for mcid, (words, tag, left, right, base, size) in enumerate(COVER_WORDS):
+        pt = size * s
+        stretch = 100 * (right - left) * s / (sum(TIMES[c] for c in words) / 1000 * pt)
+        ops.append(f'{tag} <</MCID {mcid}>> BDC BT 3 Tr /Words {pt:.2f} Tf {stretch:.1f} Tz '
+                   f'1 0 0 1 {x0 + left * s:.2f} {H - base * s:.2f} Tm ({words}) Tj ET EMC')
     draw = DecodedStreamObject()
-    draw.set_data((f'/Artifact BMC q {r:.4f} {g:.4f} {b:.4f} rg 0 0 {W:.2f} {H:.2f} re f Q '
-                   f'q {w:.2f} 0 0 {H:.2f} {(W - w) / 2:.2f} 0 cm /Cover Do Q EMC').encode('ascii'))
+    draw.set_data(' '.join(ops).encode('ascii'))
+    font = DictionaryObject({NameObject('/Type'): NameObject('/Font'), NameObject('/Subtype'): NameObject('/Type1'),
+                             NameObject('/BaseFont'): NameObject('/Times-Roman'),
+                             NameObject('/Encoding'): NameObject('/WinAnsiEncoding')})
     page = PageObject.create_blank_page(width=W, height=H)
-    page[NameObject('/Resources')] = DictionaryObject(
-        {NameObject('/XObject'): DictionaryObject({NameObject('/Cover'): writer._add_object(image)})})
+    page[NameObject('/Resources')] = DictionaryObject({
+        NameObject('/XObject'): DictionaryObject({NameObject('/Cover'): writer._add_object(image)}),
+        NameObject('/Font'): DictionaryObject({NameObject('/Words'): writer._add_object(font)})})
     page[NameObject('/Contents')] = writer._add_object(draw)
     writer.insert_page(page, 0)
+    tag_cover(writer, writer.pages[0])
     writer.set_page_label(0, 0, prefix='Cover')
     writer.set_page_label(1, len(writer.pages) - 1, style='/D', start=1)
+
+
+def tag_cover(writer, page):
+    """Put the cover's words at the head of the document's structure, as a heading (the title, both lines) and a
+    paragraph (the author), and give the cover its entry in the parent tree, which maps each marked piece of a page
+    back to its element."""
+    from pypdf.generic import ArrayObject, DictionaryObject, IndirectObject, NameObject, NumberObject
+    tree = writer._root_object['/StructTreeRoot'].get_object()
+    top_ref = tree.raw_get('/K')
+    if not isinstance(top_ref, IndirectObject):
+        sys.exit('the structure tree has no single top element to put the cover under')
+    top = top_ref.get_object()
+    elems = {}
+    for mcid, (_, tag, *_) in enumerate(COVER_WORDS):
+        if tag not in elems:
+            elems[tag] = DictionaryObject({NameObject('/Type'): NameObject('/StructElem'), NameObject('/S'): NameObject(tag),
+                                           NameObject('/P'): top_ref, NameObject('/Pg'): page.indirect_reference,
+                                           NameObject('/K'): ArrayObject()})
+        elems[tag]['/K'].append(NumberObject(mcid))
+    refs = {tag: writer._add_object(e) for tag, e in elems.items()}
+    kids = top.get('/K')
+    kids = list(kids) if isinstance(kids, list) else ([] if kids is None else [top.raw_get('/K')])
+    top[NameObject('/K')] = ArrayObject(list(refs.values()) + kids)
+    key = int(tree['/ParentTreeNextKey'])
+    page[NameObject('/StructParents')] = NumberObject(key)
+    tree['/ParentTree'].get_object()['/Nums'].extend([NumberObject(key), ArrayObject([refs[t] for _, t, *_ in COVER_WORDS])])
+    tree[NameObject('/ParentTreeNextKey')] = NumberObject(key + 1)
 
 
 def finish(pdf, html_text):
