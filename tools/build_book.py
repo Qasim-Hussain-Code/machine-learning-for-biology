@@ -9,6 +9,7 @@ OUT = os.path.join(ROOT, 'docs')
 BOOK = 'Machine Learning for Biology'
 AUTHOR = 'Qasim Hussain'
 SITE = 'https://qasim-hussain-code.github.io/machine-learning-for-biology/'   # the published address of docs/
+PUBLISHED = '2026'   # the year the book first appeared (the beta edition, 3 October 2026), for the citation tags
 EPIGRAPH = 'We’ve essentially found a way to make sand think. It’s miraculous.'
 EPI_WHO = 'Demis Hassabis'
 EPI_ROLE = ('Nobel Laureate · Co-Founder and Chair, Google DeepMind · Chief Scientist, Alphabet · '
@@ -201,6 +202,13 @@ def shell(title, current, main, prev=None, nxt=None, secs=None):
     # The card a link preview shows (assets/share-card.jpg, 1200 x 630, made from the cover), and the page's own
     # address, so that a post of any page carries the cover and search engines see one address per page.
     url = SITE + ('' if current == 'index' else f'{current}.html')
+    # Google Scholar reads these tags on the book's front page and follows citation_pdf_url to the print edition.
+    # Only the front page carries them, so that the chapters are not taken for works of their own.
+    first, last = AUTHOR.rsplit(' ', 1)
+    cite = '' if current != 'index' else (
+        f'<meta name="citation_title" content="{BOOK}">\n<meta name="citation_author" content="{last}, {first}">\n'
+        f'<meta name="citation_publication_date" content="{PUBLISHED}">\n'
+        f'<meta name="citation_pdf_url" content="{SITE}machine-learning-for-biology.pdf">\n')
     return f'''<!doctype html><html lang="en-GB" data-theme="dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)}</title>
@@ -216,7 +224,7 @@ def shell(title, current, main, prev=None, nxt=None, secs=None):
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The cover of {BOOK} by {AUTHOR}, beside its title.">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{cite}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="{FONTS}" rel="stylesheet"><link rel="stylesheet" href="assets/book.css">
 <script>(function(){{var r=document.documentElement;try{{var s=localStorage.getItem('mlb-theme');if(s)r.dataset.theme=s;}}catch(e){{}}}})();</script>
 </head><body class="lay-sidebar hs-smallcaps justify">
